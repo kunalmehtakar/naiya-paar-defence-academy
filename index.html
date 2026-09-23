@@ -410,6 +410,62 @@ header p{opacity:.9}
 </section>
 </main>
 
+<main id="studentDashboard" style="display:none;">
+<section style="max-width:700px;margin:25px auto;padding:0 14px;">
+
+<div style="background:linear-gradient(135deg,#0b3d91,#1769d1);color:#fff;border-radius:22px;padding:26px 22px;box-shadow:0 10px 28px rgba(11,61,145,.25);">
+<div style="display:flex;align-items:center;gap:15px;">
+<div style="width:62px;height:62px;border-radius:18px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:32px;">🎓</div>
+<div>
+<h2 style="margin:0;font-size:25px;">Student Dashboard</h2>
+<p style="margin:5px 0 0;opacity:.9;">NAIYA PAAR DEFENCE ACADEMY</p>
+</div>
+</div>
+
+<div style="margin-top:22px;background:rgba(255,255,255,.14);border-radius:15px;padding:14px;">
+<div style="font-size:12px;opacity:.85;">STUDENT ID</div>
+<div id="dashId" style="font-size:21px;font-weight:800;margin-top:3px;">-</div>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-top:16px;">
+
+<div style="background:#fff;border-radius:16px;padding:17px;box-shadow:0 5px 18px rgba(0,0,0,.07);">
+<div style="font-size:12px;color:#777;">STUDENT NAME</div>
+<div id="dashName" style="font-weight:800;margin-top:7px;">-</div>
+</div>
+
+<div style="background:#fff;border-radius:16px;padding:17px;box-shadow:0 5px 18px rgba(0,0,0,.07);">
+<div style="font-size:12px;color:#777;">FATHER'S NAME</div>
+<div id="dashFather" style="font-weight:800;margin-top:7px;">-</div>
+</div>
+
+<div style="background:#fff;border-radius:16px;padding:17px;box-shadow:0 5px 18px rgba(0,0,0,.07);">
+<div style="font-size:12px;color:#777;">COURSE</div>
+<div id="dashCourse" style="font-weight:800;margin-top:7px;">-</div>
+</div>
+
+<div style="background:#eaf8ee;border:1px solid #bde8ca;border-radius:16px;padding:17px;">
+<div style="font-size:12px;color:#38804a;">PAYMENT STATUS</div>
+<div id="dashPayment" style="font-weight:800;color:#147a35;margin-top:7px;">✅ Paid & Verified</div>
+</div>
+
+</div>
+
+<div style="background:#fff;border-radius:18px;padding:20px;margin-top:16px;box-shadow:0 5px 18px rgba(0,0,0,.07);">
+<h3 style="margin:0 0 15px;">Quick Actions</h3>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+<button type="button" class="submit" onclick="showStudentCard()" style="margin:0;">🪪 View ID Card</button>
+<button type="button" class="submit" onclick="logoutStudent()" style="margin:0;background:#555;">🚪 Logout</button>
+</div>
+
+<p id="dashboardMessage" style="text-align:center;margin:14px 0 0;color:#555;"></p>
+</div>
+
+</section>
+</main>
+
 <main id="registration">
 <div class="container">
 
@@ -922,26 +978,71 @@ function loginStudent(){
     }
 
     document.querySelectorAll("main").forEach(x=>x.style.display="none");
-    const reg=document.getElementById("registration");
-    if(reg) reg.style.display="block";
 
-    const regForm=document.getElementById("regForm");
-    if(regForm) regForm.style.display="none";
+    const dash=document.getElementById("studentDashboard");
+    if(dash) dash.style.display="block";
 
-    const regTitle=document.querySelector("#registration .form-box > h2");
-    if(regTitle) regTitle.style.display="none";
+    document.getElementById("dashId").textContent=st.id || "-";
+    document.getElementById("dashName").textContent=st.name || "-";
+    document.getElementById("dashFather").textContent=st.father || "-";
+    document.getElementById("dashCourse").textContent=st.course || "-";
+    document.getElementById("dashPayment").textContent="✅ Paid & Verified";
 
-    const result=document.getElementById("success");
-    if(result){
-      result.style.display="block";
-      result.style.visibility="visible";
-      result.style.opacity="1";
-      result.scrollIntoView({behavior:"smooth"});
-    }
+    window.loggedInStudent=st;
+
+    if(dash) dash.scrollIntoView({behavior:"smooth"});
   })
   .catch(()=>{
     msg.textContent="Server से connection नहीं हो सका।";
   });
+}
+
+function showStudentCard(){
+  const st=window.loggedInStudent;
+  if(!st) return;
+
+  document.querySelectorAll("main").forEach(x=>x.style.display="none");
+
+  const reg=document.getElementById("registration");
+  if(reg) reg.style.display="block";
+
+  const regForm=document.getElementById("regForm");
+  if(regForm) regForm.style.display="none";
+
+  const regTitle=document.querySelector("#registration .form-box > h2");
+  if(regTitle) regTitle.style.display="none";
+
+  document.getElementById("cardId").textContent=st.id || "";
+  document.getElementById("cardName").textContent=st.name || "";
+  document.getElementById("cardFather").textContent=st.father || "";
+  document.getElementById("cardMobile").textContent=st.mobile || "";
+  document.getElementById("cardDob").textContent=st.dob || "";
+  document.getElementById("cardCourse").textContent=st.course || "";
+  document.getElementById("cardAddress").textContent=st.address || "";
+
+  if(st.photo){
+    document.getElementById("idCardPhoto").src=st.photo;
+  }
+
+  const result=document.getElementById("success");
+  if(result){
+    result.style.display="block";
+    result.style.visibility="visible";
+    result.style.opacity="1";
+    result.scrollIntoView({behavior:"smooth"});
+  }
+}
+
+function logoutStudent(){
+  window.loggedInStudent=null;
+  document.querySelectorAll("main").forEach(x=>x.style.display="none");
+
+  const login=document.getElementById("studentLogin");
+  if(login) login.style.display="block";
+
+  document.getElementById("loginStudentId").value="";
+  document.getElementById("loginMobile").value="";
+  document.getElementById("loginMessage").textContent="";
 }
 
 async function submitRegistration(e){
