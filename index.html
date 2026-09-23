@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NAIYA PAAR DEFENCE ACADEMY</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f5f7fb;color:#222}
+header{background:linear-gradient(135deg,#0b3d91,#1769d1);color:white;padding:18px 15px;text-align:center}
+header h1{font-size:24px;margin-bottom:6px}
+header p{font-size:14px}
+.hero{padding:35px 20px;text-align:center;background:white}
+.hero h2{font-size:27px;color:#0b3d91;margin-bottom:10px}
+.hero p{font-size:16px;line-height:1.6;color:#555}
+.register-btn{display:inline-block;margin-top:22px;padding:15px 30px;background:#ff7a00;color:white;text-decoration:none;border-radius:10px;font-size:18px;font-weight:bold;box-shadow:0 5px 15px #bbb}
+.container{max-width:900px;margin:auto;padding:20px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:10px}
+.card{background:white;padding:20px;text-align:center;border-radius:12px;box-shadow:0 3px 12px #ddd}
+.card h3{color:#0b3d91;margin-bottom:8px}
+section{margin-bottom:25px}
+.form-box{background:white;padding:22px;border-radius:14px;box-shadow:0 3px 15px #ddd}
+.form-box h2{text-align:center;color:#0b3d91;margin-bottom:20px}
+label{display:block;margin-top:13px;font-weight:bold}
+input,select{width:100%;padding:12px;margin-top:6px;border:1px solid #ccc;border-radius:8px;font-size:15px}
+.submit{width:100%;margin-top:22px;padding:14px;background:#0b3d91;color:white;border:0;border-radius:9px;font-size:17px;font-weight:bold}
+.back{display:block;text-align:center;margin-top:15px;color:#0b3d91;text-decoration:none}
+#registration{display:none}
+.success{display:none;text-align:center;background:#e9fff0;padding:20px;border-radius:12px;color:#147a35;margin-top:20px}
+footer{background:#102a56;color:white;text-align:center;padding:20px;margin-top:30px;font-size:14px}
+@media(max-width:650px){.cards{grid-template-columns:1fr}.hero h2{font-size:23px}}
+</style>
+
+<style>
+/* ===== 3D BLUE ACADEMY UI ===== */
+body{
+  background:linear-gradient(180deg,#eef5ff 0%,#f8fbff 100%);
+  color:#102a56;
+}
+header{
+  background:linear-gradient(135deg,#0645c0,#1769ff);
+  padding:14px 22px;
+  box-shadow:0 8px 25px rgba(10,65,170,.25);
+  position:relative;
+  z-index:5;
+}
+header h1{font-size:22px;letter-spacing:.4px}
+header p{opacity:.9}
+
+#home .hero{
+  max-width:1250px;
+  min-height:390px;
+  margin:0 auto;
+  padding:55px 45px;
+  text-align:left;
+  border-radius:0 0 35px 35px;
+  background:
+    radial-gradient(circle at 85% 20%,rgba(255,255,255,.20),transparent 25%),
+    linear-gradient(135deg,#0648c8,#126cff 65%,#0845b5);
+  color:white;
+  overflow:hidden;
+  position:relative;
+  box-shadow:0 18px 40px rgba(8,65,180,.28);
+}
+#home .hero:after{
+  content:"";
+  position:absolute;
+  width:330px;height:330px;
+  right:-80px;bottom:-150px;
+  border-radius:50%;
+  background:rgba(255,255,255,.10);
+  box-shadow:-80px -40px 0 rgba(255,255,255,.06);
+}
+#home .hero h2{
+  max-width:620px;
+  color:white;
+  font-size:48px;
+  line-height:1.08;
+  margin-bottom:18px;
+  font-weight:900;
+  text-shadow:0 5px 12px rgba(0,0,0,.15);
+}
+#home .hero p{
+  max-width:570px;
+  color:#eef5ff;
+  font-size:18px;
+}
+#home .register-btn{
+  background:linear-gradient(135deg,#ff8a2a,#ff642d);
+  border-radius:16px;
+  padding:15px 25px;
+  box-shadow:0 9px 0 #c84920,0 15px 25px rgba(0,0,0,.18);
+  transition:.2s;
+}
+#home .register-btn:hover{
+  transform:translateY(-3px);
+}
+#home .container{
+  max-width:1250px;
+  padding:35px 22px;
+}
+#home .container h2{
+  font-size:30px!important;
+}
+#home .cards{
+  grid-template-columns:repeat(5,1fr);
+  gap:18px;
+}
+#home .card{
+  border:1px solid #dce8ff;
+  border-radius:22px;
+  padding:20px 14px;
+  min-height:145px;
+  box-shadow:0 10px 25px rgba(31,82,160,.12);
+  transition:.25s;
+  position:relative;
+  overflow:hidden;
+}
+#home .card:before{
+  content:"";
+  position:absolute;
+  width:90px;height:90px;
+  right:-35px;top:-35px;
+  border-radius:50%;
+  background:#e9f1ff;
+}
+#home .card:hover{
+  transform:translateY(-8px) rotateX(2deg);
+  box-shadow:0 18px 35px rgba(31,82,160,.20);
+}
+#home .card h3{
+  position:relative;
+  font-size:19px;
+  margin-bottom:10px;
+}
+#home .card p{
+  position:relative;
+  color:#60708c;
+  line-height:1.5;
+}
+#home > div:first-of-type{
+  margin:0!important;
+  padding:12px 20px;
+  background:white;
+}
+@media(max-width:900px){
+  #home .cards{grid-template-columns:repeat(2,1fr)}
+  #home .hero h2{font-size:38px}
+}
+@media(max-width:600px){
+  #home .hero{
+    min-height:420px;
+    padding:38px 22px;
+    border-radius:0 0 25px 25px;
+  }
+  #home .hero h2{font-size:32px}
+  #home .hero p{font-size:16px}
+  #home .cards{grid-template-columns:1fr}
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+<div style="display:flex;align-items:center;gap:12px;justify-content:center"><img src="/academy-logo.jpg" alt="Academy Logo" style="width:58px;height:58px;object-fit:cover;border-radius:50%;"><h1 style="margin:0">NAIYA PAAR DEFENCE ACADEMY</h1></div>
+<p>Physical Training • Written Preparation • Career Guidance</p>
+</header>
+
+<main id="home">
+
+<section class="hero">
+  <div style="position:relative;z-index:2;">
+    <div style="font-size:13px;letter-spacing:3px;font-weight:bold;margin-bottom:12px;">
+      YOUR DREAM • OUR MISSION
+    </div>
+
+    <h2>NAIYA PAAR<br><span style="color:#ff8a2a;">DEFENCE ACADEMY</span></h2>
+
+    <p>SSC GD, Bihar Police और Defence भर्ती की तैयारी के साथ अपने भविष्य को मजबूत बनाएं।</p>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:25px;">
+      <a href="#" class="register-btn" onclick="showRegistration();return false;">
+        🎓 Register Now →
+      </a>
+      <a href="#" class="register-btn" onclick="showStudentLogin();return false;"
+         style="background:white;color:#0751ce;box-shadow:0 7px 0 #cbd9f5;">
+        🔐 Student Login
+      </a>
+    </div>
+
+    <div style="display:flex;gap:28px;flex-wrap:wrap;margin-top:28px;font-size:14px;font-weight:bold;">
+      <span>🎯 Expert Guidance</span>
+      <span>📚 Study Material</span>
+      <span>🏆 Career Support</span>
+    </div>
+  </div>
+
+  <div style="position:absolute;right:6%;bottom:0;font-size:150px;line-height:1;
+              filter:drop-shadow(0 15px 15px rgba(0,0,0,.25));z-index:1;">
+    🪖
+  </div>
+</section>
+
+<div style="text-align:center;margin:25px 0 5px;">
+  <a href="#" onclick="showAdminPanel();return false;"
+     style="color:#0751ce;font-weight:bold;text-decoration:none;">
+    🔐 Admin Panel
+  </a>
+</div>
+
+<div class="container">
+
+<section>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h2 style="color:#102f75;margin:0;">Our Popular Courses</h2>
+    <span style="color:#0751ce;font-weight:bold;">View All Courses →</span>
+  </div>
+
+  <div class="cards">
+
+    <div class="card">
+      <div style="font-size:48px;">🪖</div>
+      <h3>SSC GD</h3>
+      <p>All Posts</p>
+      <a href="#" class="register-btn" onclick="showRegistration();return false;"
+         style="padding:10px 18px;font-size:14px;margin-top:12px;">
+        Know More →
+      </a>
+    </div>
+
+    <div class="card">
+      <div style="font-size:48px;">👮</div>
+      <h3>Bihar Police</h3>
+      <p>Police भर्ती तैयारी</p>
+      <a href="#" class="register-btn" onclick="showRegistration();return false;"
+         style="padding:10px 18px;font-size:14px;margin-top:12px;">
+        Know More →
+      </a>
+    </div>
+
+    <div class="card">
+      <div style="font-size:48px;">🎖️</div>
+      <h3>Bihar Daroga</h3>
+      <p>Daroga भर्ती तैयारी</p>
+      <a href="#" class="register-btn" onclick="showRegistration();return false;"
+         style="padding:10px 18px;font-size:14px;margin-top:12px;">
+        Know More →
+      </a>
+    </div>
+
+    <div class="card">
+      <div style="font-size:48px;">🛡️</div>
+      <h3>Bihar Home Guard</h3>
+      <p>भर्ती तैयारी</p>
+      <a href="#" class="register-btn" onclick="showRegistration();return false;"
+         style="padding:10px 18px;font-size:14px;margin-top:12px;">
+        Know More →
+      </a>
+    </div>
+
+    <div class="card">
+      <div style="font-size:48px;">🇮🇳</div>
+      <h3>Army</h3>
+      <p>Defence Preparation</p>
+      <a href="#" class="register-btn" onclick="showRegistration();return false;"
+         style="padding:10px 18px;font-size:14px;margin-top:12px;">
+        Know More →
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <div class="cards" style="grid-template-columns:repeat(4,1fr);">
+
+    <div class="card">
+      <div style="font-size:38px;">🎓</div>
+      <h3>Experienced Faculty</h3>
+      <p>Expert guidance</p>
+    </div>
+
+    <div class="card">
+      <div style="font-size:38px;">📖</div>
+      <h3>Study Material</h3>
+      <p>Complete & Updated</p>
+    </div>
+
+    <div class="card">
+      <div style="font-size:38px;">🛡️</div>
+      <h3>Mock Tests</h3>
+      <p>Improve performance</p>
+    </div>
+
+    <div class="card">
+      <div style="font-size:38px;">👥</div>
+      <h3>Personal Support</h3>
+      <p>Always with you</p>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:20px;">
+
+    <div class="card" style="background:linear-gradient(135deg,#0645c0,#1769ff);color:white;text-align:left;padding:30px;">
+      <h2 style="color:white;margin-bottom:10px;">Start Your Registration</h2>
+      <p style="color:#eef5ff;">अपने career की पहली step आज ही शुरू करें।</p>
+      <a href="#" class="register-btn" onclick="showRegistration();return false;">
+        Student Registration →
+      </a>
+    </div>
+
+    <div class="card" style="padding:30px;">
+      <h2 style="color:#102f75;">Already Registered?</h2>
+      <p style="margin:12px 0;color:#60708c;">अपने Student ID से login करें।</p>
+      <a href="#" class="register-btn" onclick="showStudentLogin();return false;"
+         style="width:100%;margin-top:10px;">
+        Student Login →
+      </a>
+    </div>
+
+  </div>
+</section>
+
+</div>
+</main>
+
+<!-- REGISTRATION PAGE -->
+
+<main id="adminPanel" style="display:none;">
+<section class="card" style="max-width:900px;margin:30px auto;">
+<h2>🔐 Admin Panel</h2>
+<div style="display:flex;gap:10px;margin:15px 0;">
+<input type="password" id="adminPassword" placeholder="Admin Password" style="flex:1;">
+<button class="register-btn" type="button" onclick="loadAdminStudents()">Login</button>
+</div>
+<p id="adminMessage"></p>
+<div id="adminStudents"></div><div style="margin-top:20px;padding:18px;background:#f1f5ff;border:1px solid #dbe5f5;border-radius:12px;">
+<h3 style="color:#0b3d91;margin-top:0;">💰 Course Registration Fees</h3>
+<div id="courseFeesBox"></div>
+<button type="button" class="register-btn" onclick="saveCourseFees()" style="margin-top:15px;">
+💾 Save Course Fees
+</button>
+<p id="feeMessage" style="margin-top:10px;"></p>
+</div>
+
+<a href="#" onclick="showHome();return false;" style="display:block;text-align:center;margin-top:20px;color:#0b3d91;font-weight:bold;">
+← Back to Home
+</a>
+</section>
+</main>
+
+<main id="paymentPage" style="display:none;">
+<section class="card" style="max-width:520px;margin:30px auto;">
+<h2>💳 Academy Registration Payment</h2>
+<p style="margin:15px 0;">Registration शुरू करने के लिए Demo Payment करें।</p>
+
+<div style="background:#f1f5ff;padding:20px;border-radius:12px;text-align:center;">
+<h3 style="color:#0b3d91;">Registration Fee</h3>
+<p id="paymentAmount" style="font-size:30px;font-weight:bold;margin:10px;">₹0</p>
+<p style="color:#666;">Demo Payment Mode</p>
+</div>
+
+<button id="payButton" type="button" class="register-btn" onclick="demoPayment()" style="width:100%;margin-top:20px;">
+💳 Pay ₹0 (Demo)
+</button>
+
+<p id="paymentMessage" style="margin-top:15px;text-align:center;"></p>
+
+<a href="#" onclick="showHome();return false;" style="display:block;text-align:center;margin-top:15px;">
+← Back to Home
+</a>
+</section>
+</main>
+
+<main id="studentLogin" style="display:none;">
+<section class="card" style="max-width:520px;margin:30px auto;">
+<h2>🔐 Student Login</h2>
+<p>अपना Student ID और Mobile Number डालकर ID Card खोलें।</p>
+
+<label>Student ID</label>
+<input type="text" id="loginStudentId" placeholder="जैसे ACA758054">
+
+<label>Mobile Number</label>
+<input type="tel" id="loginMobile" maxlength="10" placeholder="10 अंकों का Mobile Number">
+
+<button class="register-btn" type="button" onclick="loginStudent()">
+🔓 Login
+</button>
+
+<p id="loginMessage" style="margin-top:15px;"></p>
+
+<a href="#" onclick="showHome();return false;" style="display:block;margin-top:15px;">
+← Back to Home
+</a>
+</section>
+</main>
+
+<main id="registration">
+<div class="container">
+
+<div class="form-box">
+<h2>🎓 Student Registration</h2>
+
+<form id="regForm" onsubmit="submitRegistration(event); return false;">
+
+<label>Student Name</label>
+<input type="text" id="name" placeholder="अपना नाम लिखें" required>
+
+<label>Father's Name</label>
+<input type="text" id="father" placeholder="पिता का नाम" required>
+
+<label>Mobile Number</label>
+<input type="tel" id="mobile" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" required>
+
+<label>Student Photo</label>
+<input type="file" id="photo" accept="image/*" required onchange="previewPhoto(event)">
+<div style="text-align:center;margin-top:10px">
+<img id="photoPreview" style="display:none;width:120px;height:150px;object-fit:cover;border-radius:10px;border:2px solid #0b3d91">
+</div>
+
+<label>Date of Birth</label>
+<input type="date" id="dob" required>
+
+<label>Course</label>
+<select id="course" required>
+<option value="">Course चुनें</option>
+<option>SSC GD All Posts</option>
+<option>Bihar Police</option>
+<option>Bihar Daroga</option>
+<option>Bihar Home Guard</option>
+<option>Army</option>
+</select>
+
+<label>Address</label>
+<input type="text" id="address" placeholder="अपना पता लिखें" required>
+
+<button type="submit" class="submit" style="font-weight:800;font-size:18px;padding:14px 22px;cursor:pointer;">Continue Registration</button>
+
+</form>
+
+<div id="success" style="display:none;margin-top:25px">
+
+<div id="idCard" style="width:380px;max-width:100%;margin:auto;background:#fff;border:3px solid #0b3d91;border-radius:16px;overflow:hidden;box-shadow:0 5px 20px #bbb;font-family:Arial,sans-serif;">
+
+<div style="text-align:center;padding:10px 10px 0;">
+<img src="/academy-logo.jpg" alt="Academy Logo" style="width:65px;height:65px;object-fit:cover;border-radius:50%;border:2px solid #0b3d91;">
+</div>
+
+<div style="background:linear-gradient(135deg,#0b3d91,#1769d1);color:white;text-align:center;padding:14px 10px;">
+<h2 style="font-size:20px;font-weight:800;margin:0;letter-spacing:.3px;color:#fff;">NAIYA PAAR DEFENCE ACADEMY</h2>
+<p style="font-size:13px;font-weight:700;margin:7px 0 0;color:#fff;letter-spacing:1px;">STUDENT ID CARD</p>
+</div>
+
+<div style="padding:20px;text-align:center">
+
+<img id="idCardPhoto"
+alt="Student Photo"
+style="
+display:block;
+width:120px;
+height:145px;
+object-fit:cover;
+margin:0 auto 18px;
+border:3px solid #0b3d91;
+border-radius:8px;
+background:#eee;
+">
+
+<div style="
+text-align:left;
+font-size:14px;
+line-height:1.8;
+border-top:1px solid #ddd;
+padding-top:12px;
+">
+
+<div><b>Student ID:</b> <span id="cardId"></span></div>
+<div><b>Name:</b> <span id="cardName"></span></div>
+<div><b>Father's Name:</b> <span id="cardFather"></span></div>
+<div><b>Mobile:</b> <span id="cardMobile"></span></div>
+<div><b>Date of Birth:</b> <span id="cardDob"></span></div>
+<div><b>Course:</b> <span id="cardCourse"></span></div>
+<div><b>Address:</b> <span id="cardAddress"></span></div>
+
+</div>
+</div>
+
+<div style="
+background:#f1f5ff;
+text-align:center;
+padding:10px;
+font-size:11px;
+">
+Official Student Identity Card
+</div>
+
+</div>
+
+<button type="button"
+class="submit"
+onclick="downloadIDCard()"
+style="margin-top:18px">
+📥 Download ID Card
+</button>
+
+<p style="text-align:center;color:#147a35;font-weight:bold;margin-top:12px">
+Registration Successfully Completed ✅
+</p>
+
+</div>
+
+<a href="#" class="back" onclick="showHome();return false;">← Home Page पर वापस जाएँ</a>
+
+</div>
+</div>
+</main>
+
+<footer>
+<p>© 2026 NAIYA PAAR DEFENCE ACADEMY</p>
+<p>All Rights Reserved</p>
+</footer>
+
+<script>
+function showAdminPanel(){
+  document.querySelectorAll("main").forEach(x=>x.style.display="none");
+  const panel=document.getElementById("adminPanel");
+  if(panel) panel.style.display="block";
+  window.scrollTo(0,0);
+}
+
+
+function loadCourseFees(){
+  const password=document.getElementById("adminPassword").value;
+  const box=document.getElementById("courseFeesBox");
+  const msg=document.getElementById("feeMessage");
+
+  if(!password) return;
+
+  fetch("/api/course-fees")
+    .then(r=>r.json())
+    .then(data=>{
+      if(!data.success) return;
+
+      const courses=[
+        "SSC GD All Posts",
+        "Bihar Police",
+        "Bihar Daroga",
+        "Bihar Home Guard",
+        "Army"
+      ];
+
+      box.innerHTML=courses.map(course=>`
+        <div style="margin:10px 0;">
+          <label style="font-weight:bold;display:block;margin-bottom:5px;">${course}</label>
+          <input type="number" min="0" id="fee_${course.replace(/[^a-zA-Z]/g,'_')}"
+            value="${data.fees[course] || 0}"
+            style="width:100%;padding:12px;border:1px solid #ccd6e5;border-radius:8px;box-sizing:border-box;">
+        </div>
+      `).join("");
+    })
+    .catch(()=>{
+      msg.textContent="Course fees load नहीं हो सकीं।";
+    });
+}
+
+function saveCourseFees(){
+  const password=document.getElementById("adminPassword").value;
+  const msg=document.getElementById("feeMessage");
+
+  const courses=[
+    "SSC GD All Posts",
+    "Bihar Police",
+    "Bihar Daroga",
+    "Bihar Home Guard",
+    "Army"
+  ];
+
+  const fees={};
+
+  courses.forEach(course=>{
+    const id="fee_"+course.replace(/[^a-zA-Z]/g,'_');
+    fees[course]=Number(document.getElementById(id).value || 0);
+  });
+
+  fetch("/api/course-fees",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-admin-password":password
+    },
+    body:JSON.stringify(fees)
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    msg.textContent=data.success
+      ? "✅ Course fees successfully updated."
+      : (data.message || "Fee update failed.");
+  })
+  .catch(()=>{
+    msg.textContent="Server से connection नहीं हो सका।";
+  });
+}
+
+function loadAdminStudents(){
+  const password=document.getElementById("adminPassword").value;
+  const msg=document.getElementById("adminMessage");
+  const box=document.getElementById("adminStudents");
+
+  if(!password){
+    msg.textContent="कृपया Admin Password डालें।";
+    return;
+  }
+
+  msg.textContent="Students data load हो रहा है...";
+  loadCourseFees();
+
+  fetch("/api/students",{
+    headers:{"x-admin-password":password}
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(!data.success){
+      msg.textContent=data.message || "Admin login failed";
+      box.innerHTML="";
+      return;
+    }
+
+    msg.textContent="Total Students: "+data.students.length;
+
+    box.innerHTML=data.students.map((st,i)=>`
+      <div style="background:#f8faff;border:1px solid #dbe5f5;border-radius:12px;padding:15px;margin-top:12px;text-align:left;">
+        ${st.photo ? `<img src="${st.photo}" style="width:70px;height:85px;object-fit:cover;border-radius:7px;border:2px solid #0b3d91;display:block;margin-bottom:10px;">` : ""}
+        <b>Student ID:</b> ${st.id}<br>
+        <b>Name:</b> ${st.name}<br>
+        <b>Father:</b> ${st.father}<br>
+        <b>Mobile:</b> ${st.mobile}<br>
+        <b>DOB:</b> ${st.dob}<br>
+        <b>Course:</b> ${st.course}<br>
+        <b>Address:</b> ${st.address}<br><b>Payment Status:</b> ${st.paymentStatus || "Pending"}<br><b>Paid Amount:</b> ₹${st.paymentAmount || 0}<br><b>Payment Date:</b> ${st.paymentDate ? new Date(st.paymentDate).toLocaleString("en-IN") : "—"}<br>
+        <button type="button" class="register-btn" style="margin-top:10px;" onclick="showAdminStudentCard(${i})">🪪 View ID Card</button>
+        <button type="button" onclick="deleteAdminStudent(${i})" style="margin-top:10px;padding:12px 16px;background:#d32f2f;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;">🗑️ Delete Student</button>
+      </div>
+    `).join("");
+
+    window.adminStudentsData=data.students;
+  })
+  .catch(()=>{
+    msg.textContent="Server से connection नहीं हो सका।";
+  });
+}
+
+function deleteAdminStudent(i){
+  const st=window.adminStudentsData[i];
+  if(!st) return;
+
+  if(!confirm("क्या आप "+st.name+" का Student Record delete करना चाहते हैं?")){
+    return;
+  }
+
+  const password=document.getElementById("adminPassword").value;
+
+  fetch("/api/delete-student",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-admin-password":password
+    },
+    body:JSON.stringify({id:st.id})
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.success){
+      alert("Student record successfully deleted.");
+      loadAdminStudents();
+    }else{
+      alert(data.message || "Delete failed");
+    }
+  })
+  .catch(()=>{
+    alert("Server से connection नहीं हो सका।");
+  });
+}
+
+function showAdminStudentCard(i){
+  const st=window.adminStudentsData[i];
+  if(!st) return;
+
+  document.getElementById("cardId").textContent=st.id || "";
+  document.getElementById("cardName").textContent=st.name || "";
+  document.getElementById("cardFather").textContent=st.father || "";
+  document.getElementById("cardMobile").textContent=st.mobile || "";
+  document.getElementById("cardDob").textContent=st.dob || "";
+  document.getElementById("cardCourse").textContent=st.course || "";
+  document.getElementById("cardAddress").textContent=st.address || "";
+
+  if(st.photo) document.getElementById("idCardPhoto").src=st.photo;
+
+  document.querySelectorAll("main").forEach(x=>x.style.display="none");
+  const reg=document.getElementById("registration");
+  if(reg) reg.style.display="block";
+
+  const form=document.getElementById("regForm");
+  if(form) form.style.display="none";
+
+  const title=document.querySelector("#registration .form-box > h2");
+  if(title) title.style.display="none";
+
+  const success=document.getElementById("success");
+  if(success){
+    success.style.display="block";
+    success.scrollIntoView({behavior:"smooth"});
+  }
+}
+
+function showPayment(){
+  document.querySelectorAll("main").forEach(x=>x.style.display="none");
+  const page=document.getElementById("paymentPage");
+  if(page) page.style.display="block";
+  window.scrollTo(0,0);
+}
+
+function demoPayment(){
+  const msg=document.getElementById("paymentMessage");
+  msg.textContent="Payment processing...";
+
+  setTimeout(()=>{
+    msg.innerHTML="✅ Demo Payment Successful!";
+
+    if(window.pendingRegistration){
+      fetch("/api/register",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          ...window.pendingRegistration,
+          paymentStatus:"Paid",
+          paymentAmount:Number(window.pendingRegistration.paymentAmount || 0),
+          paymentDate:new Date().toISOString()
+        })
+      }).then(r=>r.json()).then(data=>{
+        if(!data.success) alert("Registration save नहीं हुआ।");
+      }).catch(()=>{
+        alert("Server से connection नहीं हो सका।");
+      });
+    }
+
+    setTimeout(()=>{
+      document.querySelectorAll("main").forEach(x=>x.style.display="none");
+      const reg=document.getElementById("registration");
+      if(reg) reg.style.display="block";
+
+      const form=document.getElementById("regForm");
+      if(form) form.style.display="none";
+
+      const title=document.querySelector("#registration .form-box > h2");
+      if(title) title.style.display="none";
+
+      const success=document.getElementById("success");
+      if(success){
+        success.style.display="block";
+        success.style.visibility="visible";
+        success.style.opacity="1";
+        success.scrollIntoView({behavior:"smooth"});
+      }
+    },800);
+  },800);
+}
+function showRegistration(){
+  document.querySelectorAll("main").forEach(x=>x.style.display="none");
+  const reg=document.getElementById("registration");
+  if(reg) reg.style.display="block";
+  const form=document.getElementById("regForm");
+  if(form) form.style.display="block";
+  const success=document.getElementById("success");
+  if(success) success.style.display="none";
+  window.scrollTo(0,0);
+}
+
+function showHome(){
+document.getElementById("registration").style.display="none";
+document.getElementById("home").style.display="block";
+window.scrollTo(0,0);
+}
+
+function previewPhoto(event){
+  const file=event.target.files && event.target.files[0];
+  const preview=document.getElementById("photoPreview");
+  if(!file) return;
+  if(!file.type.startsWith("image/")){
+    alert("कृपया JPG, PNG या WEBP photo चुनें।");
+    event.target.value="";
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=function(e){
+    preview.src=e.target.result;
+    preview.style.display="block";
+  };
+  reader.onerror=function(){
+    alert("Photo load नहीं हो सकी। दूसरी photo चुनें।");
+  };
+  reader.readAsDataURL(file);
+}
+
+function showStudentLogin(){
+  document.querySelectorAll("main").forEach(x=>{
+    x.style.display="none";
+  });
+  const box=document.getElementById("studentLogin");
+  if(box){
+    box.style.display="block";
+    box.style.visibility="visible";
+    box.style.opacity="1";
+  }
+  window.scrollTo(0,0);
+}
+
+function loginStudent(){
+  const id=document.getElementById("loginStudentId").value.trim();
+  const mobile=document.getElementById("loginMobile").value.trim();
+  const msg=document.getElementById("loginMessage");
+
+  if(!id || !mobile){
+    msg.textContent="कृपया Student ID और Mobile Number डालें।";
+    return;
+  }
+
+  msg.textContent="Login हो रहा है...";
+
+  fetch("/api/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({id:id,mobile:mobile})
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(!data.success){
+      msg.textContent=data.message || "Login failed";
+      return;
+    }
+
+    const st=data.student;
+
+    document.getElementById("cardId").textContent=st.id || "";
+    document.getElementById("cardName").textContent=st.name || "";
+    document.getElementById("cardFather").textContent=st.father || "";
+    document.getElementById("cardMobile").textContent=st.mobile || "";
+    document.getElementById("cardDob").textContent=st.dob || "";
+    document.getElementById("cardCourse").textContent=st.course || "";
+    document.getElementById("cardAddress").textContent=st.address || "";
+
+    if(st.photo){
+      document.getElementById("idCardPhoto").src=st.photo;
+    }
+
+    document.querySelectorAll("main").forEach(x=>x.style.display="none");
+    const reg=document.getElementById("registration");
+    if(reg) reg.style.display="block";
+
+    const regForm=document.getElementById("regForm");
+    if(regForm) regForm.style.display="none";
+
+    const regTitle=document.querySelector("#registration .form-box > h2");
+    if(regTitle) regTitle.style.display="none";
+
+    const result=document.getElementById("success");
+    if(result){
+      result.style.display="block";
+      result.style.visibility="visible";
+      result.style.opacity="1";
+      result.scrollIntoView({behavior:"smooth"});
+    }
+  })
+  .catch(()=>{
+    msg.textContent="Server से connection नहीं हो सका।";
+  });
+}
+
+async function submitRegistration(e){
+e.preventDefault();
+
+const name=document.getElementById("name").value.trim();
+const father=document.getElementById("father").value.trim();
+const mobile=document.getElementById("mobile").value.trim();
+const dob=document.getElementById("dob").value;
+const course=document.getElementById("course").value;
+const address=document.getElementById("address").value.trim();
+const photo=document.getElementById("photo").files[0];
+
+if(!photo){
+alert("कृपया Student Photo upload करें।");
+return;
+}
+
+if(!/^[0-9]{10}$/.test(mobile)){
+alert("कृपया सही 10 अंकों का Mobile Number डालें।");
+return;
+}
+
+const photoData=await new Promise((resolve,reject)=>{
+  const r=new FileReader();
+  r.onload=()=>resolve(r.result);
+  r.onerror=()=>reject(new Error("Photo read failed"));
+  r.readAsDataURL(photo);
+});
+
+const id="ACA"+Date.now().toString().slice(-6);
+
+document.getElementById("cardId").textContent=id;
+document.getElementById("cardName").textContent=name;
+document.getElementById("cardFather").textContent=father;
+document.getElementById("cardMobile").textContent=mobile;
+document.getElementById("cardDob").textContent=dob;
+document.getElementById("cardCourse").textContent=course;
+document.getElementById("cardAddress").textContent=address;
+
+const reader=new FileReader();
+
+reader.onload=function(event){
+document.getElementById("idCardPhoto").src=event.target.result;
+document.getElementById("success").style.display="none";
+
+window.pendingRegistration={
+  id:id,
+  name:name,
+  father:father,
+  mobile:mobile,
+  dob:dob,
+  course:course,
+  address:address,
+  photo:photoData
+};
+
+fetch("/api/course-fees")
+.then(r=>r.json())
+.then(data=>{
+  const fee=Number(data.fees?.[course] || 0);
+  window.pendingRegistration.paymentAmount=fee;
+
+  const amount=document.getElementById("paymentAmount");
+  const payBtn=document.getElementById("payButton");
+
+  if(amount) amount.textContent="₹"+fee;
+  if(payBtn) payBtn.textContent="💳 Pay ₹"+fee+" (Demo)";
+})
+.catch(()=>{
+  window.pendingRegistration.paymentAmount=0;
+});
+
+showPayment();
+};
+
+reader.onerror=function(){
+alert("Photo load नहीं हो सकी। कृपया दूसरी photo चुनें।");
+};
+
+reader.readAsDataURL(photo);
+
+
+
+}
+
+function downloadIDCard(){
+
+const card=document.getElementById("idCard");
+
+if(!card || document.getElementById("success").style.display==="none"){
+alert("पहले registration पूरा करें।");
+return;
+}
+
+const photo=document.getElementById("idCardPhoto");
+
+if(!photo.src || photo.src===""){
+alert("Student photo अभी तैयार नहीं है।");
+return;
+}
+
+const win=window.open("","_blank");
+
+if(!win){
+alert("Browser ने new window block कर दी है। कृपया popup allow करें।");
+return;
+}
+
+win.document.open();
+
+win.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Student ID Card</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+padding:25px;
+background:#eee;
+font-family:Arial,sans-serif;
+}
+#card{
+width:380px;
+max-width:100%;
+margin:auto;
+background:white;
+border:3px solid #0b3d91;
+border-radius:16px;
+overflow:hidden;
+box-shadow:0 5px 20px #bbb;
+}
+.header{
+background:#0b3d91;
+color:white;
+text-align:center;
+padding:16px;
+}
+.header h2{margin:0;font-size:20px}
+.header p{font-size:12px;margin:7px 0 0}
+.content{padding:20px;text-align:center}
+.photo{
+display:block;
+width:120px;
+height:145px;
+object-fit:cover;
+margin:0 auto 18px;
+border:3px solid #0b3d91;
+border-radius:8px;
+}
+.details{
+text-align:left;
+font-size:14px;
+line-height:1.8;
+border-top:1px solid #ddd;
+padding-top:12px;
+}
+.footer{
+background:#f1f5ff;
+text-align:center;
+padding:10px;
+font-size:11px;
+}
+@media print{
+body{background:white;padding:0}
+#card{box-shadow:none}
+}
+</style>
+</head>
+
+<body>
+
+<div id="card">
+
+<div class="header">
+<h2>NAIYA PAAR DEFENCE ACADEMY</h2>
+<p>STUDENT ID CARD</p>
+</div>
+
+<div class="content">
+
+<img class="photo" src="${photo.src}" alt="Student Photo">
+
+<div class="details">
+<div><b>Student ID:</b> ${document.getElementById("cardId").textContent}</div>
+<div><b>Name:</b> ${document.getElementById("cardName").textContent}</div>
+<div><b>Father's Name:</b> ${document.getElementById("cardFather").textContent}</div>
+<div><b>Mobile:</b> ${document.getElementById("cardMobile").textContent}</div>
+<div><b>Date of Birth:</b> ${document.getElementById("cardDob").textContent}</div>
+<div><b>Course:</b> ${document.getElementById("cardCourse").textContent}</div>
+<div><b>Address:</b> ${document.getElementById("cardAddress").textContent}</div>
+</div>
+
+</div>
+
+<div class="footer">
+Official Student Identity Card
+</div>
+
+</div>
+
+<script>
+window.onload=function(){
+setTimeout(function(){
+window.print();
+},700);
+};
+<\/script>
+
+</body>
+</html>
+`);
+
+win.document.close();
+}
+
+</script>
+
+</script>
+
+</body>
+</html>
+
+<style>
+/* ===== 3D REGISTRATION / PAYMENT / ID CARD UI ===== */
+#registration,
+#paymentPage,
+#studentLogin,
+#adminPanel{
+  background:linear-gradient(180deg,#eef5ff,#f8fbff)!important;
+  min-height:70vh;
+}
+
+#registration .form-box,
+#paymentPage .form-box,
+#studentLogin .form-box,
+#adminPanel .form-box{
+  border:1px solid #d9e7ff!important;
+  border-radius:24px!important;
+  box-shadow:0 15px 35px rgba(20,75,160,.14)!important;
+  overflow:hidden;
+}
+
+#registration .form-box h2,
+#paymentPage .form-box h2,
+#studentLogin .form-box h2,
+#adminPanel .form-box h2{
+  background:linear-gradient(135deg,#0648c8,#1769ff);
+  color:white!important;
+  margin:-22px -22px 22px!important;
+  padding:22px!important;
+}
+
+#registration input,
+#registration select,
+#registration textarea,
+#studentLogin input,
+#adminPanel input{
+  border:1px solid #cbdcf7!important;
+  border-radius:12px!important;
+  background:#f8fbff!important;
+  outline:none;
+}
+
+#registration input:focus,
+#registration select:focus,
+#registration textarea:focus,
+#studentLogin input:focus{
+  border-color:#1769ff!important;
+  box-shadow:0 0 0 3px rgba(23,105,255,.12);
+}
+
+#paymentPage .register-btn,
+#studentLogin .register-btn{
+  border-radius:14px!important;
+  background:linear-gradient(135deg,#ff8a2a,#ff642d)!important;
+  box-shadow:0 6px 0 #c84920,0 12px 22px rgba(255,100,45,.2)!important;
+}
+
+#success{
+  border:1px solid #b9ebcb!important;
+  border-radius:20px!important;
+  box-shadow:0 12px 30px rgba(20,130,70,.12)!important;
+}
+
+</style>
+
+<style>
+/* ===== REGISTRATION 3D FINISH ===== */
+#registration .form-box{
+  max-width:620px!important;
+  margin:25px auto!important;
+  padding:28px!important;
+  background:rgba(255,255,255,.96)!important;
+  border:1px solid #d7e5ff!important;
+  border-radius:24px!important;
+  box-shadow:0 18px 45px rgba(20,70,150,.16)!important;
+}
+
+#registration .form-box h2{
+  font-size:24px!important;
+  text-align:center!important;
+  color:#0b3d91!important;
+  margin-bottom:25px!important;
+}
+
+#registration label{
+  color:#173968!important;
+  font-size:14px!important;
+  margin-top:14px!important;
+}
+
+#registration input,
+#registration select{
+  min-height:48px!important;
+  border:1px solid #c9daf5!important;
+  border-radius:12px!important;
+  background:#f8fbff!important;
+  padding:12px!important;
+}
+
+#registration .submit{
+  background:linear-gradient(135deg,#0648c8,#1769ff)!important;
+  border-radius:14px!important;
+  padding:15px!important;
+  box-shadow:0 6px 0 #073c9c,0 12px 22px rgba(23,105,255,.22)!important;
+  cursor:pointer!important;
+  transition:.2s!important;
+}
+
+#registration .submit:hover{
+  transform:translateY(-2px);
+}
+
+#registration .back{
+  color:#0751ce!important;
+  font-weight:bold!important;
+}
+
+#registration input[type="file"]{
+  padding:9px!important;
+}
+
+@media(max-width:650px){
+  #registration .form-box{
+    margin:18px 14px!important;
+    padding:20px!important;
+    border-radius:20px!important;
+  }
+}
+</style>
+
+<style>
+#registration .form-box h2{
+  color:#fff!important;
+  background:linear-gradient(135deg,#0648c8,#1769ff)!important;
+  text-shadow:0 2px 5px rgba(0,0,0,.18)!important;
+}
+
+#registration #regForm button[type="submit"],
+#registration .submit{
+  display:block!important;
+  width:100%!important;
+  margin-top:22px!important;
+  padding:15px 20px!important;
+  background:linear-gradient(135deg,#ff8a2a,#ff642d)!important;
+  color:#fff!important;
+  border:0!important;
+  border-radius:14px!important;
+  font-size:16px!important;
+  font-weight:800!important;
+  box-shadow:0 6px 0 #c84920,0 12px 22px rgba(255,100,45,.22)!important;
+  cursor:pointer!important;
+}
+</style>
+
+<style>
+#registration .form-box h2{
+  color:#fff!important;
+  background:linear-gradient(135deg,#0648c8,#1769ff)!important;
+  text-shadow:0 2px 5px rgba(0,0,0,.18)!important;
+}
+
+#registration #regForm button[type="submit"],
+#registration .submit{
+  display:block!important;
+  width:100%!important;
+  margin-top:22px!important;
+  padding:15px 20px!important;
+  background:linear-gradient(135deg,#ff8a2a,#ff642d)!important;
+  color:#fff!important;
+  border:0!important;
+  border-radius:14px!important;
+  font-size:16px!important;
+  font-weight:800!important;
+  box-shadow:0 6px 0 #c84920,0 12px 22px rgba(255,100,45,.22)!important;
+  cursor:pointer!important;
+}
+</style>
+
+<style>
+/* ===== 3D PAYMENT PAGE ===== */
+#paymentPage{
+  padding:25px 15px!important;
+}
+
+#paymentPage .form-box{
+  max-width:500px!important;
+  margin:20px auto!important;
+  padding:28px!important;
+  background:#fff!important;
+  border:1px solid #d7e5ff!important;
+  border-radius:24px!important;
+  box-shadow:0 18px 45px rgba(20,70,150,.16)!important;
+  text-align:center!important;
+}
+
+#paymentPage .form-box h2{
+  color:#fff!important;
+  background:linear-gradient(135deg,#0648c8,#1769ff)!important;
+  margin:-28px -28px 25px!important;
+  padding:22px!important;
+  border-radius:24px 24px 0 0!important;
+  font-size:23px!important;
+}
+
+#paymentAmount{
+  color:#0751ce!important;
+  background:#eef5ff!important;
+  border:1px solid #d5e4ff!important;
+  border-radius:18px!important;
+  padding:18px!important;
+  margin:20px 0!important;
+}
+
+#payButton{
+  width:100%!important;
+  padding:16px!important;
+  border:0!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,#ff8a2a,#ff642d)!important;
+  color:#fff!important;
+  font-size:17px!important;
+  font-weight:800!important;
+  box-shadow:0 6px 0 #c84920,0 12px 22px rgba(255,100,45,.22)!important;
+  cursor:pointer!important;
+}
+
+#paymentMessage{
+  font-weight:bold!important;
+  margin-top:18px!important;
+}
+
+</style>
+
+<style>
+/* ===== 3D STUDENT ID CARD ===== */
+#registration .id-card,
+#idCard{
+  max-width:430px!important;
+  margin:25px auto!important;
+  background:#fff!important;
+  border:2px solid #1769ff!important;
+  border-radius:22px!important;
+  overflow:hidden!important;
+  box-shadow:0 18px 40px rgba(10,70,170,.22)!important;
+  position:relative!important;
+}
+
+#registration .id-card:before,
+#idCard:before{
+  content:"NAIYA PAAR DEFENCE ACADEMY";
+  display:block!important;
+  background:linear-gradient(135deg,#0648c8,#1769ff)!important;
+  color:#fff!important;
+  text-align:center!important;
+  padding:16px 10px!important;
+  font-size:16px!important;
+  font-weight:900!important;
+  letter-spacing:.4px!important;
+}
+
+#idCardPhoto{
+  width:100px!important;
+  height:120px!important;
+  object-fit:cover!important;
+  border:3px solid #1769ff!important;
+  border-radius:12px!important;
+  box-shadow:0 6px 15px rgba(0,0,0,.15)!important;
+}
+
+#registration #success{
+  max-width:600px!important;
+  margin:25px auto!important;
+  background:#f8fbff!important;
+  padding:25px!important;
+  border-radius:22px!important;
+}
+
+#registration #success h3{
+  color:#0751ce!important;
+  font-size:22px!important;
+}
+
+</style>
+
+<style>
+/* ===== ID CARD HEADER CLEANUP ===== */
+#idCard:before,
+#registration .id-card:before{
+  display:none!important;
+}
+
+#idCard,
+#registration .id-card{
+  border:2px solid #1769ff!important;
+  border-radius:22px!important;
+  box-shadow:0 18px 40px rgba(10,70,170,.22)!important;
+}
+
+#idCardPhoto{
+  display:block!important;
+  margin:14px auto!important;
+}
+</style>
+
+<style>
+/* ===== 3D STUDENT LOGIN ===== */
+#studentLogin{
+  padding:25px 15px!important;
+}
+
+#studentLogin .form-box{
+  max-width:460px!important;
+  margin:25px auto!important;
+  padding:28px!important;
+  background:#fff!important;
+  border:1px solid #d7e5ff!important;
+  border-radius:24px!important;
+  box-shadow:0 18px 45px rgba(20,70,150,.16)!important;
+}
+
+#studentLogin .form-box h2{
+  color:#fff!important;
+  background:linear-gradient(135deg,#0648c8,#1769ff)!important;
+  margin:-28px -28px 25px!important;
+  padding:22px!important;
+  border-radius:24px 24px 0 0!important;
+  text-align:center!important;
+  font-size:23px!important;
+}
+
+#studentLogin input{
+  min-height:48px!important;
+  border:1px solid #c9daf5!important;
+  border-radius:12px!important;
+  background:#f8fbff!important;
+  padding:12px!important;
+}
+
+#studentLogin input:focus{
+  border-color:#1769ff!important;
+  box-shadow:0 0 0 3px rgba(23,105,255,.12)!important;
+}
+
+#studentLogin button,
+#studentLogin .register-btn{
+  width:100%!important;
+  margin-top:20px!important;
+  padding:15px!important;
+  border:0!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,#ff8a2a,#ff642d)!important;
+  color:#fff!important;
+  font-size:17px!important;
+  font-weight:800!important;
+  box-shadow:0 6px 0 #c84920,0 12px 22px rgba(255,100,45,.22)!important;
+  cursor:pointer!important;
+}
+
+#studentLogin #loginMessage{
+  margin-top:15px!important;
+  font-weight:bold!important;
+  text-align:center!important;
+}
+</style>
+
+<style>
+/* ===== 3D ADMIN PANEL ===== */
+#adminPanel{
+  padding:25px 15px!important;
+}
+
+#adminPanel .form-box{
+  max-width:850px!important;
+  margin:20px auto!important;
+  padding:28px!important;
+  background:#fff!important;
+  border:1px solid #d7e5ff!important;
+  border-radius:24px!important;
+  box-shadow:0 18px 45px rgba(20,70,150,.16)!important;
+}
+
+#adminPanel .form-box h2{
+  color:#fff!important;
+  background:linear-gradient(135deg,#0648c8,#1769ff)!important;
+  margin:-28px -28px 25px!important;
+  padding:22px!important;
+  border-radius:24px 24px 0 0!important;
+}
+
+#adminPanel #adminStudents > div{
+  background:linear-gradient(135deg,#f8fbff,#eef5ff)!important;
+  border:1px solid #d5e4ff!important;
+  border-radius:18px!important;
+  box-shadow:0 10px 25px rgba(20,70,150,.10)!important;
+}
+
+#adminPanel button.register-btn{
+  background:linear-gradient(135deg,#ff8a2a,#ff642d)!important;
+  border-radius:12px!important;
+  box-shadow:0 5px 0 #c84920!important;
+}
+
+#adminPanel input{
+  border:1px solid #cbdcf7!important;
+  border-radius:12px!important;
+  background:#f8fbff!important;
+  padding:13px!important;
+}
+
+#adminPanel input:focus{
+  border-color:#1769ff!important;
+  box-shadow:0 0 0 3px rgba(23,105,255,.12)!important;
+}
+
+#courseFeesBox > div{
+  background:#fff!important;
+  padding:12px!important;
+  border-radius:12px!important;
+}
+
+</style>
+
+<style>
+/* ===== STUDENT LOGIN 3D FINISH ===== */
+#studentLogin{
+  padding:35px 15px!important;
+}
+
+#studentLogin .form-box{
+  max-width:460px!important;
+  margin:20px auto!important;
+  padding:28px!important;
+  background:#fff!important;
+  border:1px solid #d7e5ff!important;
+  border-radius:24px!important;
+  box-shadow:0 18px 45px rgba(20,70,150,.16)!important;
+}
+
+#studentLogin .form-box h2{
+  color:#fff!important;
+  background:linear-gradient(135deg,#0648c8,#1769ff)!important;
+  margin:-28px -28px 22px!important;
+  padding:20px!important;
+  border-radius:24px 24px 0 0!important;
+  text-align:center!important;
+  font-size:23px!important;
+}
+
+#studentLogin label{
+  color:#173968!important;
+  font-weight:700!important;
+}
+
+#studentLogin input{
+  min-height:48px!important;
+  border:1px solid #c9daf5!important;
+  border-radius:12px!important;
+  background:#f8fbff!important;
+}
+
+#studentLogin input:focus{
+  border-color:#1769ff!important;
+  box-shadow:0 0 0 3px rgba(23,105,255,.12)!important;
+}
+
+#studentLogin .register-btn{
+  width:100%!important;
+  padding:15px!important;
+  border:0!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,#ff8a2a,#ff642d)!important;
+  color:#fff!important;
+  font-weight:800!important;
+  box-shadow:0 6px 0 #c84920,0 12px 22px rgba(255,100,45,.22)!important;
+}
+
+</style>
+
+<style>
+/* ===== ADMIN STUDENT MANAGEMENT UI ===== */
+#adminPanel{
+  padding:25px 15px!important;
+}
+
+#adminPanel .form-box{
+  max-width:850px!important;
+  margin:20px auto!important;
+  padding:28px!important;
+  background:#fff!important;
+  border:1px solid #d7e5ff!important;
+  border-radius:24px!important;
+  box-shadow:0 18px 45px rgba(20,70,150,.14)!important;
+}
+
+#adminPanel #adminStudents{
+  margin-top:20px!important;
+}
+
+#adminPanel #adminStudents > div{
+  background:linear-gradient(145deg,#ffffff,#f4f8ff)!important;
+  border:1px solid #d6e4fa!important;
+  border-left:5px solid #1769ff!important;
+  border-radius:18px!important;
+  padding:18px!important;
+  margin-top:14px!important;
+  box-shadow:0 8px 22px rgba(20,70,150,.10)!important;
+}
+
+#adminPanel #adminStudents img{
+  border-radius:12px!important;
+  border:3px solid #1769ff!important;
+}
+
+#adminPanel #adminStudents button{
+  border-radius:12px!important;
+  font-weight:800!important;
+  box-shadow:0 4px 0 rgba(0,0,0,.15)!important;
+}
+
+#adminPanel #courseFeesBox{
+  display:grid!important;
+  grid-template-columns:repeat(2,1fr)!important;
+  gap:12px!important;
+}
+
+@media(max-width:650px){
+  #adminPanel .form-box{
+    margin:15px 5px!important;
+    padding:20px!important;
+  }
+
+  #adminPanel #courseFeesBox{
+    grid-template-columns:1fr!important;
+  }
+}
+</style>
+
+<style>
+/* ===== ADMIN STUDENT MANAGEMENT UI ===== */
+#adminPanel{
+  padding:25px 15px!important;
+}
+
+#adminPanel .form-box{
+  max-width:850px!important;
+  margin:20px auto!important;
+  padding:28px!important;
+  background:#fff!important;
+  border:1px solid #d7e5ff!important;
+  border-radius:24px!important;
+  box-shadow:0 18px 45px rgba(20,70,150,.14)!important;
+}
+
+#adminPanel #adminStudents{
+  margin-top:20px!important;
+}
+
+#adminPanel #adminStudents > div{
+  background:linear-gradient(145deg,#ffffff,#f4f8ff)!important;
+  border:1px solid #d6e4fa!important;
+  border-left:5px solid #1769ff!important;
+  border-radius:18px!important;
+  padding:18px!important;
+  margin-top:14px!important;
+  box-shadow:0 8px 22px rgba(20,70,150,.10)!important;
+}
+
+#adminPanel #adminStudents img{
+  border-radius:12px!important;
+  border:3px solid #1769ff!important;
+}
+
+#adminPanel #adminStudents button{
+  border-radius:12px!important;
+  font-weight:800!important;
+  box-shadow:0 4px 0 rgba(0,0,0,.15)!important;
+}
+
+#adminPanel #courseFeesBox{
+  display:grid!important;
+  grid-template-columns:repeat(2,1fr)!important;
+  gap:12px!important;
+}
+
+@media(max-width:650px){
+  #adminPanel .form-box{
+    margin:15px 5px!important;
+    padding:20px!important;
+  }
+
+  #adminPanel #courseFeesBox{
+    grid-template-columns:1fr!important;
+  }
+}
+</style>
