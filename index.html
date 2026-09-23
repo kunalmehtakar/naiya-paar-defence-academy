@@ -335,7 +335,7 @@ header p{opacity:.9}
 <section class="card" style="max-width:900px;margin:30px auto;">
 <h2>🔐 Admin Panel</h2>
 <div style="display:flex;gap:10px;margin:15px 0;">
-<input type="password" id="adminPassword" placeholder="Admin Password" style="flex:1;">
+<input type="text" id="adminUsername" placeholder="Admin Username" style="flex:1;margin-bottom:8px;"><input type="password" id="adminPassword" placeholder="Admin Password" style="flex:1;">
 <button class="register-btn" type="button" onclick="loadAdminStudents()">Login</button>
 </div>
 <p id="adminMessage"></p>
@@ -357,19 +357,29 @@ header p{opacity:.9}
 <main id="paymentPage" style="display:none;">
 <section class="card" style="max-width:520px;margin:30px auto;">
 <h2>💳 Academy Registration Payment</h2>
-<p style="margin:15px 0;">Registration शुरू करने के लिए Demo Payment करें।</p>
+<p style="margin:15px 0;">Registration fee का payment Cash या UPI से करें।</p>
 
 <div style="background:#f1f5ff;padding:20px;border-radius:12px;text-align:center;">
 <h3 style="color:#0b3d91;">Registration Fee</h3>
 <p id="paymentAmount" style="font-size:30px;font-weight:bold;margin:10px;">₹0</p>
-<p style="color:#666;">Demo Payment Mode</p>
+<p style="color:#666;">Manual Payment</p>
 </div>
 
-<button id="payButton" type="button" class="register-btn" onclick="demoPayment()" style="width:100%;margin-top:20px;">
-💳 Pay ₹0 (Demo)
+<label style="display:block;font-weight:bold;margin-top:18px;">Payment Method</label>
+<select id="paymentMethod" style="width:100%;padding:13px;border:1px solid #ccd2dc;border-radius:9px;font-size:15px;">
+<option value="">Payment Method चुनें</option>
+<option value="Cash">Cash</option>
+<option value="UPI">UPI</option>
+</select>
+
+<label style="display:block;font-weight:bold;margin-top:15px;">UPI Reference / UTR Number</label>
+<input id="paymentReference" type="text" placeholder="UPI payment होने पर UTR/Reference Number" style="width:100%;padding:13px;border:1px solid #ccd2dc;border-radius:9px;font-size:15px;">
+
+<button id="payButton" type="button" class="register-btn" onclick="submitManualPayment()" style="width:100%;margin-top:20px;">
+📝 Submit Payment Details
 </button>
 
-<p id="paymentMessage" style="margin-top:15px;text-align:center;"></p>
+<p id="paymentMessage" style="margin-top:15px;text-align:center;font-weight:bold;"></p>
 
 <a href="#" onclick="showHome();return false;" style="display:block;text-align:center;margin-top:15px;">
 ← Back to Home
@@ -620,7 +630,10 @@ function loadAdminStudents(){
   loadCourseFees();
 
   fetch("/api/students",{
-    headers:{"x-admin-password":password}
+    headers:{
+      "x-admin-username":document.getElementById("adminUsername").value.trim(),
+      "x-admin-password":password
+    }
   })
   .then(r=>r.json())
   .then(data=>{
@@ -643,6 +656,9 @@ function loadAdminStudents(){
         <b>Course:</b> ${st.course}<br>
         <b>Address:</b> ${st.address}<br><b>Payment Status:</b> ${st.paymentStatus || "Pending"}<br><b>Paid Amount:</b> ₹${st.paymentAmount || 0}<br><b>Payment Date:</b> ${st.paymentDate ? new Date(st.paymentDate).toLocaleString("en-IN") : "—"}<br>
         <button type="button" class="register-btn" style="margin-top:10px;" onclick="showAdminStudentCard(${i})">🪪 View ID Card</button>
+        ${st.paymentStatus==="Paid"
+          ? `<button type="button" style="margin-top:10px;padding:12px 16px;background:#198754;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;" onclick="setPaymentStatus(${i},'Pending')">↩️ Mark Pending</button>`
+          : `<button type="button" style="margin-top:10px;padding:12px 16px;background:#198754;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;" onclick="setPaymentStatus(${i},'Paid')">✅ Mark Paid</button>`}
         <button type="button" onclick="deleteAdminStudent(${i})" style="margin-top:10px;padding:12px 16px;background:#d32f2f;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;">🗑️ Delete Student</button>
       </div>
     `).join("");
@@ -651,6 +667,39 @@ function loadAdminStudents(){
   })
   .catch(()=>{
     msg.textContent="Server से connection नहीं हो सका।";
+  });
+}
+
+function setPaymentStatus(i,status){
+  const st=window.adminStudentsData[i];
+  if(!st) return;
+
+  const password=document.getElementById("adminPassword").value;
+
+  fetch("/api/payment-status",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "x-admin-password":password
+    },
+    body:JSON.stringify({
+      id:st.id,
+      paymentStatus:status
+    })
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.success){
+      alert(status==="Paid"
+        ? "Payment verified. Student ID Card is now active."
+        : "Payment status changed to Pending.");
+      loadAdminStudents();
+    }else{
+      alert(data.message || "Payment status update failed");
+    }
+  })
+  .catch(()=>{
+    alert("Server से connection नहीं हो सका।");
   });
 }
 
@@ -724,51 +773,61 @@ function showPayment(){
   window.scrollTo(0,0);
 }
 
-function demoPayment(){
+function submitManualPayment(){
   const msg=document.getElementById("paymentMessage");
-  msg.textContent="Payment processing...";
+  const method=document.getElementById("paymentMethod").value;
+  const reference=document.getElementById("paymentReference").value.trim();
 
-  setTimeout(()=>{
-    msg.innerHTML="✅ Demo Payment Successful!";
+  if(!window.pendingRegistration){
+    msg.textContent="Registration details नहीं मिले। कृपया फिर से registration करें।";
+    return;
+  }
 
-    if(window.pendingRegistration){
-      fetch("/api/register",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          ...window.pendingRegistration,
-          paymentStatus:"Paid",
-          paymentAmount:Number(window.pendingRegistration.paymentAmount || 0),
-          paymentDate:new Date().toISOString()
-        })
-      }).then(r=>r.json()).then(data=>{
-        if(!data.success) alert("Registration save नहीं हुआ।");
-      }).catch(()=>{
-        alert("Server से connection नहीं हो सका।");
-      });
+  if(!method){
+    msg.textContent="कृपया Payment Method चुनें।";
+    return;
+  }
+
+  if(method==="UPI" && !reference){
+    msg.textContent="UPI payment के लिए UTR/Reference Number डालें।";
+    return;
+  }
+
+  msg.textContent="Registration save हो रहा है...";
+
+  const record={
+    ...window.pendingRegistration,
+    paymentStatus:"Pending",
+    paymentMethod:method,
+    paymentReference:reference,
+    paymentAmount:Number(window.pendingRegistration.paymentAmount || 0),
+    paymentDate:new Date().toISOString()
+  };
+
+  fetch("/api/register",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(record)
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(!data.success){
+      msg.textContent=data.message || "Registration save नहीं हुआ।";
+      return;
     }
 
+    msg.innerHTML="✅ Registration submitted successfully.<br><span style='color:#b26a00;'>Payment verification के बाद Student ID Card active होगा।</span>";
+
     setTimeout(()=>{
-      document.querySelectorAll("main").forEach(x=>x.style.display="none");
-      const reg=document.getElementById("registration");
-      if(reg) reg.style.display="block";
-
-      const form=document.getElementById("regForm");
-      if(form) form.style.display="none";
-
-      const title=document.querySelector("#registration .form-box > h2");
-      if(title) title.style.display="none";
-
-      const success=document.getElementById("success");
-      if(success){
-        success.style.display="block";
-        success.style.visibility="visible";
-        success.style.opacity="1";
-        success.scrollIntoView({behavior:"smooth"});
-      }
-    },800);
-  },800);
+      showHome();
+      alert("Registration सफल है। Payment verification के बाद आपका Student ID Card active होगा।");
+    },1500);
+  })
+  .catch(()=>{
+    msg.textContent="Server से connection नहीं हो सका।";
+  });
 }
+
 function showRegistration(){
   document.querySelectorAll("main").forEach(x=>x.style.display="none");
   const reg=document.getElementById("registration");
@@ -845,6 +904,11 @@ function loginStudent(){
 
     const st=data.student;
 
+    if(st.paymentStatus !== "Paid"){
+      msg.textContent="Payment अभी verify नहीं हुआ है। Admin verification के बाद Student ID Card active होगा।";
+      return;
+    }
+
     document.getElementById("cardId").textContent=st.id || "";
     document.getElementById("cardName").textContent=st.name || "";
     document.getElementById("cardFather").textContent=st.father || "";
@@ -881,87 +945,92 @@ function loginStudent(){
 }
 
 async function submitRegistration(e){
-e.preventDefault();
+  e.preventDefault();
 
-const name=document.getElementById("name").value.trim();
-const father=document.getElementById("father").value.trim();
-const mobile=document.getElementById("mobile").value.trim();
-const dob=document.getElementById("dob").value;
-const course=document.getElementById("course").value;
-const address=document.getElementById("address").value.trim();
-const photo=document.getElementById("photo").files[0];
+  const name=document.getElementById("name").value.trim();
+  const father=document.getElementById("father").value.trim();
+  const mobile=document.getElementById("mobile").value.trim();
+  const dob=document.getElementById("dob").value;
+  const course=document.getElementById("course").value;
+  const address=document.getElementById("address").value.trim();
+  const photo=document.getElementById("photo").files[0];
 
-if(!photo){
-alert("कृपया Student Photo upload करें।");
-return;
-}
+  if(!photo){
+    alert("कृपया Student Photo upload करें।");
+    return;
+  }
 
-if(!/^[0-9]{10}$/.test(mobile)){
-alert("कृपया सही 10 अंकों का Mobile Number डालें।");
-return;
-}
+  if(!/^[0-9]{10}$/.test(mobile)){
+    alert("कृपया सही 10 अंकों का Mobile Number डालें।");
+    return;
+  }
 
-const photoData=await new Promise((resolve,reject)=>{
-  const r=new FileReader();
-  r.onload=()=>resolve(r.result);
-  r.onerror=()=>reject(new Error("Photo read failed"));
-  r.readAsDataURL(photo);
-});
+  try{
+    const photoData=await new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(reader.result);
+      reader.onerror=()=>reject(new Error("Photo read failed"));
+      reader.readAsDataURL(photo);
+    });
 
-const id="ACA"+Date.now().toString().slice(-6);
+    const id="ACA"+Date.now().toString().slice(-6);
 
-document.getElementById("cardId").textContent=id;
-document.getElementById("cardName").textContent=name;
-document.getElementById("cardFather").textContent=father;
-document.getElementById("cardMobile").textContent=mobile;
-document.getElementById("cardDob").textContent=dob;
-document.getElementById("cardCourse").textContent=course;
-document.getElementById("cardAddress").textContent=address;
+    document.getElementById("cardId").textContent=id;
+    document.getElementById("cardName").textContent=name;
+    document.getElementById("cardFather").textContent=father;
+    document.getElementById("cardMobile").textContent=mobile;
+    document.getElementById("cardDob").textContent=dob;
+    document.getElementById("cardCourse").textContent=course;
+    document.getElementById("cardAddress").textContent=address;
+    document.getElementById("idCardPhoto").src=photoData;
 
-const reader=new FileReader();
+    document.getElementById("success").style.display="none";
 
-reader.onload=function(event){
-document.getElementById("idCardPhoto").src=event.target.result;
-document.getElementById("success").style.display="none";
+    window.pendingRegistration={
+      id:id,
+      name:name,
+      father:father,
+      mobile:mobile,
+      dob:dob,
+      course:course,
+      address:address,
+      photo:photoData,
+      paymentStatus:"Pending"
+    };
 
-window.pendingRegistration={
-  id:id,
-  name:name,
-  father:father,
-  mobile:mobile,
-  dob:dob,
-  course:course,
-  address:address,
-  photo:photoData
-};
+    const amount=document.getElementById("paymentAmount");
+    if(amount) amount.textContent="Loading...";
 
-fetch("/api/course-fees")
-.then(r=>r.json())
-.then(data=>{
-  const fee=Number(data.fees?.[course] || 0);
-  window.pendingRegistration.paymentAmount=fee;
+    const payBtn=document.getElementById("payButton");
+    if(payBtn) payBtn.textContent="📝 Submit Payment Details";
 
-  const amount=document.getElementById("paymentAmount");
-  const payBtn=document.getElementById("payButton");
+    const method=document.getElementById("paymentMethod");
+    const reference=document.getElementById("paymentReference");
 
-  if(amount) amount.textContent="₹"+fee;
-  if(payBtn) payBtn.textContent="💳 Pay ₹"+fee+" (Demo)";
-})
-.catch(()=>{
-  window.pendingRegistration.paymentAmount=0;
-});
+    if(method) method.value="";
+    if(reference) reference.value="";
 
-showPayment();
-};
+    const msg=document.getElementById("paymentMessage");
+    if(msg) msg.textContent="";
 
-reader.onerror=function(){
-alert("Photo load नहीं हो सकी। कृपया दूसरी photo चुनें।");
-};
+    fetch("/api/course-fees")
+      .then(r=>r.json())
+      .then(data=>{
+        const fee=Number(data.fees?.[course] || 0);
+        window.pendingRegistration.paymentAmount=fee;
+        if(amount) amount.textContent="₹"+fee;
+      })
+      .catch(()=>{
+        window.pendingRegistration.paymentAmount=0;
+        if(amount) amount.textContent="₹0";
+      });
 
-reader.readAsDataURL(photo);
+    showPayment();
 
-
-
+  }catch(err){
+    console.error(err);
+    alert("Photo process नहीं हो सका। कृपया दूसरी photo चुनें।");
+  }
 }
 
 function downloadIDCard(){

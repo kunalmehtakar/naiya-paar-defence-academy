@@ -3,6 +3,22 @@ const fs=require('fs');
 const path=require('path');
 const DATA_FILE=path.join(__dirname,'students.json');
 const FEES_FILE=path.join(__dirname,'course_fees.json');
+const ADMIN_FILE=path.join(__dirname,'.admin_credentials');
+
+function checkAdmin(req){
+  const username=req.headers['x-admin-username'] || '';
+  const password=req.headers['x-admin-password'] || '';
+
+  try{
+    const credentials=fs.readFileSync(ADMIN_FILE,'utf8').split(/\r?\n/);
+    const savedUser=(credentials[0] || '').trim();
+    const savedPass=(credentials[1] || '').trim();
+
+    return username===savedUser && password===savedPass;
+  }catch(e){
+    return false;
+  }
+}
 
 function readCourseFees(){
   try{
@@ -35,8 +51,7 @@ const server=http.createServer((req,res)=>{
   }
 
   if(req.url==='/api/course-fees' && req.method==='POST'){
-    const adminPassword=req.headers['x-admin-password'];
-    if(adminPassword!=='admin123'){
+    if(!checkAdmin(req)){
       res.writeHead(401,{'Content-Type':'application/json'});
       res.end(JSON.stringify({success:false,message:'Admin login required'}));
       return;
@@ -59,9 +74,68 @@ const server=http.createServer((req,res)=>{
   }
 
 
-  if(req.url==='/api/delete-student' && req.method==='POST'){
+  if(req.url==='/api/payment-status' && req.method==='POST'){
     const adminPassword=req.headers['x-admin-password'];
-    if(adminPassword!=='admin123'){
+
+    if(!checkAdmin(req)){
+      res.writeHead(401,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({success:false,message:'Admin login required'}));
+      return;
+    }
+
+    let body='';
+    req.on('data',chunk=>body+=chunk);
+
+    req.on('end',()=>{
+      try{
+        const {id,paymentStatus}=JSON.parse(body);
+
+        if(!id || !['Paid','Pending'].includes(paymentStatus)){
+          res.writeHead(400,{'Content-Type':'application/json'});
+          res.end(JSON.stringify({success:false,message:'Invalid payment data'}));
+          return;
+        }
+
+        const data=JSON.parse(fs.readFileSync(DATA_FILE,'utf8'));
+        const students=Array.isArray(data.students)?data.students:[];
+
+        const index=students.findIndex(st=>st.id===id);
+
+        if(index===-1){
+          res.writeHead(404,{'Content-Type':'application/json'});
+          res.end(JSON.stringify({success:false,message:'Student not found'}));
+          return;
+        }
+
+        students[index].paymentStatus=paymentStatus;
+
+        if(paymentStatus==='Paid'){
+          students[index].paymentDate=new Date().toISOString();
+          students[index].paymentVerifiedAt=new Date().toISOString();
+        }else{
+          students[index].paymentVerifiedAt=null;
+        }
+
+        fs.writeFileSync(DATA_FILE,JSON.stringify({students:students},null,2));
+
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({
+          success:true,
+          message:paymentStatus==='Paid'
+            ? 'Payment verified successfully'
+            : 'Payment changed to Pending'
+        }));
+
+      }catch(e){
+        res.writeHead(500,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({success:false,message:'Payment status update failed'}));
+      }
+    });
+    return;
+  }
+
+  if(req.url==='/api/delete-student' && req.method==='POST'){
+    if(!checkAdmin(req)){
       res.writeHead(401,{'Content-Type':'application/json'});
       res.end(JSON.stringify({success:false,message:'Admin login required'}));
       return;
@@ -94,8 +168,7 @@ const server=http.createServer((req,res)=>{
   }
 
   if(req.url==='/api/students' && req.method==='GET'){
-    const adminPassword=req.headers['x-admin-password'];
-    if(adminPassword!=='admin123'){
+    if(!checkAdmin(req)){
       res.writeHead(401,{'Content-Type':'application/json'});
       res.end(JSON.stringify({success:false,message:'Admin login required'}));
       return;
