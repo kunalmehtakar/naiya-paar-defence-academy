@@ -327,6 +327,8 @@ header p{opacity:.9}
 </section>
 
 </div>
+
+
 </main>
 
 <!-- REGISTRATION PAGE -->
@@ -347,6 +349,9 @@ header p{opacity:.9}
 </button>
 <p id="feeMessage" style="margin-top:10px;"></p>
 </div>
+
+
+
 
 <a href="#" onclick="showHome();return false;" style="display:block;text-align:center;margin-top:20px;color:#0b3d91;font-weight:bold;">
 ← Back to Home
@@ -589,7 +594,11 @@ Registration Successfully Completed ✅
 <footer>
 <p>© 2026 NAIYA PAAR DEFENCE ACADEMY</p>
 <p>All Rights Reserved</p>
-</footer>
+<div class="social-media">
+<a href="https://youtube.com/@naiyapaar_defence_academy" target="_blank">▶️ YouTube</a>
+<a href="https://www.facebook.com/profile.php?id=61585861932202" target="_blank">📘 Facebook</a>
+<a href="https://www.instagram.com/naiyapaar_defence_academey/" target="_blank">📸 Instagram</a>
+</div></footer>
 
 <script>
 function showAdminPanel(){
@@ -598,6 +607,7 @@ function showAdminPanel(){
   if(panel) panel.style.display="block";
   window.scrollTo(0,0);
 }
+
 
 
 function loadCourseFees(){
@@ -673,21 +683,22 @@ function saveCourseFees(){
 }
 
 function loadAdminStudents(){
+  const username=document.getElementById("adminUsername").value.trim();
   const password=document.getElementById("adminPassword").value;
   const msg=document.getElementById("adminMessage");
   const box=document.getElementById("adminStudents");
 
-  if(!password){
-    msg.textContent="कृपया Admin Password डालें।";
+  if(!username || !password){
+    msg.textContent="कृपया Admin Username और Password डालें।";
     return;
   }
 
-  msg.textContent="Students data load हो रहा है...";
-  loadCourseFees();
+  msg.textContent="Admin login हो रहा है...";
 
   fetch("/api/students",{
+    method:"GET",
     headers:{
-      "x-admin-username":document.getElementById("adminUsername").value.trim(),
+      "x-admin-username":username,
       "x-admin-password":password
     }
   })
@@ -699,31 +710,75 @@ function loadAdminStudents(){
       return;
     }
 
-    msg.textContent="Total Students: "+data.students.length;
-
-    box.innerHTML=data.students.map((st,i)=>`
-      <div style="background:#f8faff;border:1px solid #dbe5f5;border-radius:12px;padding:15px;margin-top:12px;text-align:left;">
-        ${st.photo ? `<img src="${st.photo}" style="width:70px;height:85px;object-fit:cover;border-radius:7px;border:2px solid #0b3d91;display:block;margin-bottom:10px;">` : ""}
-        <b>Student ID:</b> ${st.id}<br>
-        <b>Name:</b> ${st.name}<br>
-        <b>Father:</b> ${st.father}<br>
-        <b>Mobile:</b> ${st.mobile}<br>
-        <b>DOB:</b> ${st.dob}<br>
-        <b>Course:</b> ${st.course}<br>
-        <b>Address:</b> ${st.address}<br><b>Payment Status:</b> ${st.paymentStatus || "Pending"}<br><b>Paid Amount:</b> ₹${st.paymentAmount || 0}<br><b>Payment Date:</b> ${st.paymentDate ? new Date(st.paymentDate).toLocaleString("en-IN") : "—"}<br>
-        <button type="button" class="register-btn" style="margin-top:10px;" onclick="showAdminStudentCard(${i})">🪪 View ID Card</button>
-        ${st.paymentStatus==="Paid"
-          ? `<button type="button" style="margin-top:10px;padding:12px 16px;background:#198754;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;" onclick="setPaymentStatus(${i},'Pending')">↩️ Mark Pending</button>`
-          : `<button type="button" style="margin-top:10px;padding:12px 16px;background:#198754;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;" onclick="setPaymentStatus(${i},'Paid')">✅ Mark Paid</button>`}
-        <button type="button" onclick="deleteAdminStudent(${i})" style="margin-top:10px;padding:12px 16px;background:#d32f2f;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;">🗑️ Delete Student</button>
-      </div>
-    `).join("");
+    msg.textContent="✅ Admin Login Successful • Total Students: "+data.students.length;
 
     window.adminStudentsData=data.students;
+
+    box.innerHTML=`
+      <div style="background:#fff;padding:15px;border-radius:14px;margin-bottom:15px;box-shadow:0 4px 14px rgba(0,0,0,.06);">
+        <input id="studentSearch" type="search"
+          placeholder="🔎 Student ID, Name या Mobile से खोजें"
+          oninput="filterAdminStudents()"
+          style="width:100%;padding:13px;border:1px solid #ccd6e5;border-radius:10px;font-size:15px;">
+
+        <select id="studentPaymentFilter"
+          onchange="filterAdminStudents()"
+          style="width:100%;margin-top:10px;padding:13px;border:1px solid #ccd6e5;border-radius:10px;font-size:15px;">
+          <option value="All">सभी Payment Status</option>
+          <option value="Paid">✅ Paid</option>
+          <option value="Pending">⏳ Pending</option>
+        </select>
+      </div>
+
+      <div id="filteredStudentList"></div>
+    `;
+
+    filterAdminStudents();
+    loadCourseFees();
   })
   .catch(()=>{
-    msg.textContent="Server से connection नहीं हो सका।";
+    msg.textContent="❌ Server से connection नहीं हो सका।";
   });
+}
+function filterAdminStudents(){
+  const list=document.getElementById("filteredStudentList");
+  if(!list || !window.adminStudentsData) return;
+
+  const q=(document.getElementById("studentSearch")?.value || "").trim().toLowerCase();
+  const status=document.getElementById("studentPaymentFilter")?.value || "All";
+
+  const matches=window.adminStudentsData
+    .map((st,i)=>({st,i}))
+    .filter(({st})=>{
+      const text=[st.id,st.name,st.mobile].join(" ").toLowerCase();
+      return (!q || text.includes(q)) &&
+             (status==="All" || (st.paymentStatus || "Pending")===status);
+    });
+
+  list.innerHTML=matches.length ? matches.map(({st,i})=>`
+    <div style="background:#f8faff;border:1px solid #dbe5f5;border-radius:12px;padding:15px;margin-top:12px;text-align:left;">
+      ${st.photo ? `<img src="${st.photo}" style="width:70px;height:85px;object-fit:cover;border-radius:7px;border:2px solid #0b3d91;display:block;margin-bottom:10px;">` : ""}
+      <b>Student ID:</b> ${st.id}<br>
+      <b>Name:</b> ${st.name}<br>
+      <b>Father:</b> ${st.father}<br>
+      <b>Mobile:</b> ${st.mobile}<br>
+      <b>DOB:</b> ${st.dob}<br>
+      <b>Course:</b> ${st.course}<br>
+      <b>Address:</b> ${st.address}<br>
+      <b>Payment Status:</b> ${st.paymentStatus || "Pending"}<br>
+      <b>Paid Amount:</b> ₹${st.paymentAmount || 0}<br>
+      <b>Payment Date:</b> ${st.paymentDate ? new Date(st.paymentDate).toLocaleString("en-IN") : "—"}<br>
+
+      ${st.paymentStatus==="Paid"
+? `<div style="margin-top:10px;padding:10px;background:#e8f7ee;color:#198754;border-radius:9px;font-weight:bold;">✅ Payment Verified</div>
+<button type="button" style="margin-top:10px;padding:12px 16px;background:#6c757d;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;" onclick="setPaymentStatus(${i},'Pending')">↩️ Mark Pending</button>`
+: `<button type="button" style="margin-top:10px;padding:12px 16px;background:#198754;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;" onclick="setPaymentStatus(${i},'Paid')">✅ Verify Payment / Mark Paid</button>`}
+${st.paymentStatus==="Paid"
+? `<button type="button" class="register-btn" style="margin-top:10px;" onclick="showAdminStudentCard(${i})">🪪 View ID Card</button>`
+: ""}
+<button type="button" onclick="deleteAdminStudent(${i})" style="margin-top:10px;padding:12px 16px;background:#d32f2f;color:white;border:0;border-radius:9px;font-weight:bold;cursor:pointer;">🗑️ Delete Student</button>
+    </div>
+  `).join("") : `<div style="padding:25px;text-align:center;color:#777;">कोई Student नहीं मिला।</div>`;
 }
 
 function setPaymentStatus(i,status){
@@ -736,6 +791,7 @@ function setPaymentStatus(i,status){
     method:"POST",
     headers:{
       "Content-Type":"application/json",
+      "x-admin-username":document.getElementById("adminUsername").value.trim(),
       "x-admin-password":password
     },
     body:JSON.stringify({
@@ -773,6 +829,7 @@ function deleteAdminStudent(i){
     method:"POST",
     headers:{
       "Content-Type":"application/json",
+      "x-admin-username":document.getElementById("adminUsername").value.trim(),
       "x-admin-password":password
     },
     body:JSON.stringify({id:st.id})
@@ -1261,7 +1318,6 @@ window.print();
 },700);
 };
 <\/script>
-
 </body>
 </html>
 `);

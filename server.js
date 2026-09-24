@@ -4,6 +4,10 @@ const path=require('path');
 const DATA_FILE=path.join(__dirname,'students.json');
 const FEES_FILE=path.join(__dirname,'course_fees.json');
 const ADMIN_FILE=path.join(__dirname,'.admin_credentials');
+const GALLERY_FILE=path.join(__dirname,'gallery.json');
+const GALLERY_DIR=path.join(__dirname,'gallery');
+if(!fs.existsSync(GALLERY_DIR)) fs.mkdirSync(GALLERY_DIR,{recursive:true});
+if(!fs.existsSync(GALLERY_FILE)) fs.writeFileSync(GALLERY_FILE,'[]');
 
 function checkAdmin(req){
   const username=req.headers['x-admin-username'] || '';
@@ -43,6 +47,76 @@ function saveStudent(student){
 }
 
 const server=http.createServer((req,res)=>{
+
+  if(req.url==='/api/gallery' && req.method==='GET'){
+    try{
+      const gallery=JSON.parse(fs.readFileSync(GALLERY_FILE,'utf8'));
+      res.writeHead(200,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({success:true,gallery:Array.isArray(gallery)?gallery:[]}));
+    }catch(e){
+      res.writeHead(500,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({success:false,message:'Gallery read failed'}));
+    }
+    return;
+  }
+
+  if(req.url==='/api/gallery' && req.method==='POST'){
+    if(!checkAdmin(req)){
+      res.writeHead(401,{'Content-Type':'application/json'});
+      res.end(JSON.stringify({success:false,message:'Admin login required'}));
+      return;
+    }
+
+    let body='';
+    req.on('data',chunk=>body+=chunk);
+    req.on('end',()=>{
+      try{
+        const item=JSON.parse(body);
+
+        if(!item.name || !item.data){
+          res.writeHead(400,{'Content-Type':'application/json'});
+          res.end(JSON.stringify({success:false,message:'Photo data missing'}));
+          return;
+        }
+
+        const match=String(item.data).match(/^data:image\/(jpeg|jpg|png|webp);base64,(.+)$/);
+        if(!match){
+          res.writeHead(400,{'Content-Type':'application/json'});
+          res.end(JSON.stringify({success:false,message:'Only JPG, PNG or WebP images are allowed'}));
+          return;
+        }
+
+        const ext=match[1]==='jpeg' || match[1]==='jpg' ? 'jpg' : match[1];
+        const filename='gallery_'+Date.now()+'.'+ext;
+        fs.writeFileSync(path.join(GALLERY_DIR,filename),Buffer.from(match[2],'base64'));
+
+        let gallery=[];
+        try{
+          gallery=JSON.parse(fs.readFileSync(GALLERY_FILE,'utf8'));
+          if(!Array.isArray(gallery)) gallery=[];
+        }catch(e){}
+
+        const photo={
+          id:Date.now().toString(),
+          name:String(item.name).trim(),
+          file:'/gallery/'+filename,
+          date:new Date().toISOString()
+        };
+
+        gallery.unshift(photo);
+        fs.writeFileSync(GALLERY_FILE,JSON.stringify(gallery,null,2));
+
+        res.writeHead(200,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({success:true,message:'Photo uploaded successfully',photo:photo}));
+      }catch(e){
+        res.writeHead(500,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({success:false,message:'Gallery upload failed'}));
+      }
+    });
+    return;
+  }
+
+
   if(req.url==='/api/course-fees' && req.method==='GET'){
     const fees=readCourseFees();
     res.writeHead(200,{'Content-Type':'application/json'});
