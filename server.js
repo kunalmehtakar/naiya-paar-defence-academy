@@ -383,4 +383,4 @@ function register(e){
   res.end(fs.readFileSync(path.join(__dirname,'index.html')));
 });
 
-server.listen(3000,()=>console.log('Academy Website: http://localhost:3000'));
+server.listen(process.env.PORT || 3000,()=>console.log('Academy Website: http://localhost:3000'));
