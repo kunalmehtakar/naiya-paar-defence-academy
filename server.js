@@ -13,15 +13,20 @@ function checkAdmin(req){
   const username=req.headers['x-admin-username'] || '';
   const password=req.headers['x-admin-password'] || '';
 
-  try{
-    const credentials=fs.readFileSync(ADMIN_FILE,'utf8').split(/\r?\n/);
-    const savedUser=(credentials[0] || '').trim();
-    const savedPass=(credentials[1] || '').trim();
+  let savedUser=(process.env.ADMIN_USERNAME || '').trim();
+  let savedPass=(process.env.ADMIN_PASSWORD || '').trim();
 
-    return username===savedUser && password===savedPass;
-  }catch(e){
-    return false;
+  if(!savedUser || !savedPass){
+    try{
+      const credentials=fs.readFileSync(ADMIN_FILE,'utf8').split(/\r?\n/);
+      savedUser=(credentials[0] || '').trim();
+      savedPass=(credentials[1] || '').trim();
+    }catch(e){
+      return false;
+    }
   }
+
+  return username===savedUser && password===savedPass;
 }
 
 function readCourseFees(){
