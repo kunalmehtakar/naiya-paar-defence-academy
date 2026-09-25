@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://naiya-paar-defence-academy.onrender.com/sitemap.xml
