@@ -52,6 +52,17 @@ function saveStudent(student){
 }
 
 const server=http.createServer((req,res)=>{
+  if(req.url==='/sitemap.xml' && req.method==='GET'){
+    res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8'});
+    return res.end(fs.readFileSync(path.join(__dirname,'sitemap.xml'),'utf8'));
+  }
+
+  if(req.url==='/robots.txt' && req.method==='GET'){
+    res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});
+    return res.end(fs.readFileSync(path.join(__dirname,'robots.txt'),'utf8'));
+  }
+
+
 
   if(req.url==='/api/gallery' && req.method==='GET'){
     try{
