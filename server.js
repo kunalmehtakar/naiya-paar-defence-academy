@@ -9,6 +9,7 @@ const GALLERY_FILE=path.join(__dirname,'gallery.json');
 const GALLERY_DIR=path.join(__dirname,'gallery');
 if(!fs.existsSync(GALLERY_DIR)) fs.mkdirSync(GALLERY_DIR,{recursive:true});
 if(!fs.existsSync(GALLERY_FILE)) fs.writeFileSync(GALLERY_FILE,'[]');
+if(!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE,JSON.stringify({students:[]},null,2));
 
 
 const ADMIN_LOGIN_ATTEMPTS=new Map();
