@@ -1,4 +1,5 @@
 const http=require('http');
+const crypto=require('crypto');
 const fs=require('fs');
 const path=require('path');
 const DATA_FILE=path.join(__dirname,'students.json');
@@ -8,6 +9,111 @@ const GALLERY_FILE=path.join(__dirname,'gallery.json');
 const GALLERY_DIR=path.join(__dirname,'gallery');
 if(!fs.existsSync(GALLERY_DIR)) fs.mkdirSync(GALLERY_DIR,{recursive:true});
 if(!fs.existsSync(GALLERY_FILE)) fs.writeFileSync(GALLERY_FILE,'[]');
+
+
+const ADMIN_LOGIN_ATTEMPTS=new Map();
+const ADMIN_MAX_ATTEMPTS=5;
+const ADMIN_BLOCK_TIME=10*60*1000;
+
+const ADMIN_SESSIONS=new Map();
+const SESSION_TTL=30*60*1000;
+
+const STUDENT_LOGIN_RATE_LIMIT=new Map();
+const STUDENT_LOGIN_MAX_ATTEMPTS=10;
+const STUDENT_LOGIN_WINDOW=10*60*1000;
+
+function checkStudentLoginRateLimit(req){
+  const ip=String(
+    req.headers['x-forwarded-for'] ||
+    req.socket.remoteAddress ||
+    'unknown'
+  ).split(',')[0].trim();
+
+  const now=Date.now();
+  const current=STUDENT_LOGIN_RATE_LIMIT.get(ip) || {count:0,windowStart:now};
+
+  if(now-current.windowStart>=STUDENT_LOGIN_WINDOW){
+    current.count=0;
+    current.windowStart=now;
+  }
+
+  current.count++;
+
+  STUDENT_LOGIN_RATE_LIMIT.set(ip,current);
+
+  return current.count<=STUDENT_LOGIN_MAX_ATTEMPTS;
+}
+
+const REGISTER_RATE_LIMIT=new Map();
+const REGISTER_MAX_REQUESTS=5;
+const REGISTER_WINDOW=10*60*1000;
+
+function checkRegisterRateLimit(req){
+  const ip=String(
+    req.headers['x-forwarded-for'] ||
+    req.socket.remoteAddress ||
+    'unknown'
+  ).split(',')[0].trim();
+
+  const now=Date.now();
+  const current=REGISTER_RATE_LIMIT.get(ip) || {count:0,windowStart:now};
+
+  if(now-current.windowStart>=REGISTER_WINDOW){
+    current.count=0;
+    current.windowStart=now;
+  }
+
+  current.count++;
+
+  if(current.count>REGISTER_MAX_REQUESTS){
+    REGISTER_RATE_LIMIT.set(ip,current);
+    return false;
+  }
+
+  REGISTER_RATE_LIMIT.set(ip,current);
+  return true;
+}
+
+function createAdminSession(username){
+  const token=crypto.randomBytes(32).toString('hex');
+  ADMIN_SESSIONS.set(token,{username,expires:Date.now()+SESSION_TTL});
+  return token;
+}
+
+function getAdminSession(req){
+  const header=String(req.headers.authorization || '');
+  if(!header.startsWith('Bearer ')) return null;
+
+  const token=header.slice(7).trim();
+  const session=ADMIN_SESSIONS.get(token);
+
+  if(!session) return null;
+
+  if(session.expires<Date.now()){
+    ADMIN_SESSIONS.delete(token);
+    return null;
+  }
+
+  session.expires=Date.now()+SESSION_TTL;
+  return session;
+}
+
+function requireAdminSession(req,res){
+  const session=getAdminSession(req);
+  if(!session){
+    res.writeHead(401,{'Content-Type':'application/json'});
+    res.end(JSON.stringify({success:false,message:'Admin session expired or invalid'}));
+    return false;
+  }
+  return true;
+}
+
+function logoutAdminSession(req){
+  const header=String(req.headers.authorization || '');
+  if(header.startsWith('Bearer ')){
+    ADMIN_SESSIONS.delete(header.slice(7).trim());
+  }
+}
 
 function checkAdmin(req){
   const username=req.headers['x-admin-username'] || '';
@@ -52,6 +158,11 @@ function saveStudent(student){
 }
 
 const server=http.createServer((req,res)=>{
+  res.setHeader('X-Content-Type-Options','nosniff');
+  res.setHeader('X-Frame-Options','SAMEORIGIN');
+  res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
+
   if(req.url==='/sitemap.xml' && req.method==='GET'){
     res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8'});
     return res.end(fs.readFileSync(path.join(__dirname,'sitemap.xml'),'utf8'));
@@ -63,6 +174,94 @@ const server=http.createServer((req,res)=>{
   }
 
 
+
+  if(req.url==='/api/admin/login' && req.method==='POST'){
+    let body='';
+    let bodySize=0;
+    const MAX_BODY=10*1024;
+
+    req.on('data',chunk=>{
+      bodySize+=chunk.length;
+      if(bodySize<=MAX_BODY) body+=chunk;
+    });
+
+    req.on('end',()=>{
+      if(bodySize>MAX_BODY){
+        res.writeHead(413,{'Content-Type':'application/json'});
+        return res.end(JSON.stringify({success:false,message:'Course fees request too large'}));
+      }
+      if(bodySize>MAX_BODY){
+        res.writeHead(413,{'Content-Type':'application/json'});
+        return res.end(JSON.stringify({success:false,message:'Gallery upload too large'}));
+      }
+      try{
+        if(bodySize>MAX_BODY){
+          res.writeHead(413,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({success:false,message:'Request too large'}));
+        }
+
+        const login=JSON.parse(body);
+        const username=String(login.username || '').trim();
+        const password=String(login.password || '');
+
+        const fakeReq={
+          headers:{
+            'x-admin-username':username,
+            'x-admin-password':password
+          }
+        };
+
+        const ip=String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
+        const now=Date.now();
+        const attempt=ADMIN_LOGIN_ATTEMPTS.get(ip) || {count:0,blockedUntil:0};
+
+        if(attempt.blockedUntil>now){
+          res.writeHead(429,{'Content-Type':'application/json','Retry-After':String(Math.ceil((attempt.blockedUntil-now)/1000))});
+          return res.end(JSON.stringify({success:false,message:'बहुत अधिक login attempts। कुछ मिनट बाद फिर कोशिश करें।'}));
+        }
+
+        if(!checkAdmin(fakeReq)){
+          attempt.count++;
+          if(attempt.count>=ADMIN_MAX_ATTEMPTS){
+            attempt.blockedUntil=now+ADMIN_BLOCK_TIME;
+            attempt.count=0;
+          }
+          ADMIN_LOGIN_ATTEMPTS.set(ip,attempt);
+
+          res.writeHead(401,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({success:false,message:'Invalid admin credentials'}));
+        }
+
+        ADMIN_LOGIN_ATTEMPTS.delete(ip);
+
+        const token=createAdminSession(username);
+
+        res.writeHead(200,{
+          'Content-Type':'application/json',
+          'Cache-Control':'no-store'
+        });
+        res.end(JSON.stringify({
+          success:true,
+          message:'Admin login successful',
+          token:token
+        }));
+      }catch(e){
+        res.writeHead(400,{'Content-Type':'application/json'});
+        res.end(JSON.stringify({success:false,message:'Invalid login data'}));
+      }
+    });
+    return;
+  }
+
+  if(req.url==='/api/admin/logout' && req.method==='POST'){
+    logoutAdminSession(req);
+    res.writeHead(200,{
+      'Content-Type':'application/json',
+      'Cache-Control':'no-store'
+    });
+    res.end(JSON.stringify({success:true,message:'Logged out'}));
+    return;
+  }
 
   if(req.url==='/api/gallery' && req.method==='GET'){
     try{
@@ -77,14 +276,21 @@ const server=http.createServer((req,res)=>{
   }
 
   if(req.url==='/api/gallery' && req.method==='POST'){
-    if(!checkAdmin(req)){
+    if(!requireAdminSession(req,res)){
       res.writeHead(401,{'Content-Type':'application/json'});
       res.end(JSON.stringify({success:false,message:'Admin login required'}));
       return;
     }
 
     let body='';
-    req.on('data',chunk=>body+=chunk);
+    let bodySize=0;
+    const MAX_BODY=2*1024*1024;
+
+    req.on('data',chunk=>{
+      bodySize+=chunk.length;
+      if(bodySize<=MAX_BODY) body+=chunk;
+    });
+
     req.on('end',()=>{
       try{
         const item=JSON.parse(body);
@@ -141,17 +347,49 @@ const server=http.createServer((req,res)=>{
   }
 
   if(req.url==='/api/course-fees' && req.method==='POST'){
-    if(!checkAdmin(req)){
+    if(!requireAdminSession(req,res)){
       res.writeHead(401,{'Content-Type':'application/json'});
       res.end(JSON.stringify({success:false,message:'Admin login required'}));
       return;
     }
 
     let body='';
-    req.on('data',chunk=>body+=chunk);
+    let bodySize=0;
+    const MAX_BODY=1024*1024;
+
+    req.on('data',chunk=>{
+      bodySize+=chunk.length;
+      if(bodySize<=MAX_BODY) body+=chunk;
+    });
+
     req.on('end',()=>{
       try{
         const fees=JSON.parse(body);
+
+        if(!fees || typeof fees!=='object' || Array.isArray(fees)){
+          res.writeHead(400,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({success:false,message:'Invalid course fees data'}));
+        }
+
+        const keys=Object.keys(fees);
+        if(keys.length>50){
+          res.writeHead(400,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({success:false,message:'Too many courses'}));
+        }
+
+        for(const key of keys){
+          if(!key.trim() || key.length>100){
+            res.writeHead(400,{'Content-Type':'application/json'});
+            return res.end(JSON.stringify({success:false,message:'Invalid course name'}));
+          }
+
+          const value=fees[key];
+          if(typeof value!=='number' || !Number.isFinite(value) || value<0 || value>1000000){
+            res.writeHead(400,{'Content-Type':'application/json'});
+            return res.end(JSON.stringify({success:false,message:'Invalid course fee'}));
+          }
+        }
+
         saveCourseFees(fees);
         res.writeHead(200,{'Content-Type':'application/json'});
         res.end(JSON.stringify({success:true,message:'Course fees updated',fees:fees}));
@@ -165,19 +403,28 @@ const server=http.createServer((req,res)=>{
 
 
   if(req.url==='/api/payment-status' && req.method==='POST'){
-    const adminPassword=req.headers['x-admin-password'];
-
-    if(!checkAdmin(req)){
+    if(!requireAdminSession(req,res)){
       res.writeHead(401,{'Content-Type':'application/json'});
       res.end(JSON.stringify({success:false,message:'Admin login required'}));
       return;
     }
 
     let body='';
-    req.on('data',chunk=>body+=chunk);
+    let bodySize=0;
+    const MAX_BODY=10*1024;
+
+    req.on('data',chunk=>{
+      bodySize+=chunk.length;
+      if(bodySize<=MAX_BODY) body+=chunk;
+    });
 
     req.on('end',()=>{
       try{
+        if(bodySize>MAX_BODY){
+          res.writeHead(413,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({success:false,message:'Payment request too large'}));
+        }
+
         const {id,paymentStatus}=JSON.parse(body);
 
         if(!id || !['Paid','Pending'].includes(paymentStatus)){
@@ -225,17 +472,34 @@ const server=http.createServer((req,res)=>{
   }
 
   if(req.url==='/api/delete-student' && req.method==='POST'){
-    if(!checkAdmin(req)){
+    if(!requireAdminSession(req,res)){
       res.writeHead(401,{'Content-Type':'application/json'});
       res.end(JSON.stringify({success:false,message:'Admin login required'}));
       return;
     }
 
     let body='';
-    req.on('data',chunk=>body+=chunk);
+    let bodySize=0;
+    const MAX_BODY=10*1024;
+
+    req.on('data',chunk=>{
+      bodySize+=chunk.length;
+      if(bodySize<=MAX_BODY) body+=chunk;
+    });
+
     req.on('end',()=>{
       try{
+        if(bodySize>MAX_BODY){
+          res.writeHead(413,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({success:false,message:'Delete request too large'}));
+        }
+
         const {id}=JSON.parse(body);
+
+        if(typeof id!=='string' || !id.trim() || id.length>50){
+          res.writeHead(400,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({success:false,message:'Invalid student ID'}));
+        }
         const data=JSON.parse(fs.readFileSync(DATA_FILE,'utf8'));
         const students=Array.isArray(data.students)?data.students:[];
         const newStudents=students.filter(st=>st.id!==id);
@@ -258,7 +522,7 @@ const server=http.createServer((req,res)=>{
   }
 
   if(req.url==='/api/students' && req.method==='GET'){
-    if(!checkAdmin(req)){
+    if(!requireAdminSession(req,res)){
       res.writeHead(401,{'Content-Type':'application/json'});
       res.end(JSON.stringify({success:false,message:'Admin login required'}));
       return;
@@ -276,19 +540,55 @@ const server=http.createServer((req,res)=>{
   }
 
   if(req.url==='/api/login' && req.method==='POST'){
+  if(!checkStudentLoginRateLimit(req)){
+    res.writeHead(429,{
+      'Content-Type':'application/json',
+      'Retry-After':'600'
+    });
+    return res.end(JSON.stringify({
+      success:false,
+      message:'बहुत अधिक login attempts। कुछ मिनट बाद फिर कोशिश करें।'
+    }));
+  }
+
   let body='';
-  req.on('data',chunk=>body+=chunk);
+  let bodySize=0;
+  const MAX_BODY=10*1024;
+
+  req.on('data',chunk=>{
+    bodySize+=chunk.length;
+    if(bodySize<=MAX_BODY) body+=chunk;
+  });
+
   req.on('end',()=>{
     try{
+      if(bodySize>MAX_BODY){
+        res.writeHead(413,{'Content-Type':'application/json'});
+        return res.end(JSON.stringify({success:false,message:'Login request too large'}));
+      }
+
       const login=JSON.parse(body);
+      const id=String(login.id || '').trim();
+      const mobile=String(login.mobile || '').trim();
+
+      if(!id || !mobile || id.length>50 || mobile.length>15 || !/^[0-9+ -]+$/.test(mobile)){
+        res.writeHead(400,{'Content-Type':'application/json'});
+        return res.end(JSON.stringify({success:false,message:'Invalid login data'}));
+      }
+
       const data=JSON.parse(fs.readFileSync(DATA_FILE,'utf8'));
       const students=Array.isArray(data.students)?data.students:[];
+
       const student=students.find(x=>
-        String(x.id).trim()===String(login.id).trim() &&
-        String(x.mobile).trim()===String(login.mobile).trim()
+        String(x.id).trim()===id &&
+        String(x.mobile).trim()===mobile
       );
 
-      res.writeHead(200,{'Content-Type':'application/json'});
+      res.writeHead(200,{
+        'Content-Type':'application/json',
+        'Cache-Control':'no-store'
+      });
+
       if(student){
         res.end(JSON.stringify({success:true,student:student}));
       }else{
@@ -303,29 +603,104 @@ const server=http.createServer((req,res)=>{
 }
 
 if(req.url==='/api/register' && req.method==='POST'){
+    if(!checkRegisterRateLimit(req)){
+      res.writeHead(429,{
+        'Content-Type':'application/json',
+        'Retry-After':'600'
+      });
+      return res.end(JSON.stringify({
+        success:false,
+        message:'बहुत अधिक registration requests। कुछ मिनट बाद फिर कोशिश करें।'
+      }));
+    }
     let body='';
-    req.on('data',chunk=>body+=chunk);
+    let bodySize=0;
+    const MAX_BODY=100*1024;
+
+    req.on('data',chunk=>{
+      bodySize+=chunk.length;
+      if(bodySize<=MAX_BODY) body+=chunk;
+    });
+
     req.on('end',()=>{
       try{
-        const student=JSON.parse(body);
-        if(!student.id || !student.name || !student.mobile){
+        if(bodySize>MAX_BODY){
+          res.writeHead(413,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({success:false,message:'Request too large'}));
+        }
+
+        const input=JSON.parse(body);
+        const name=String(input.name || '').trim();
+        const mobile=String(input.mobile || '').trim();
+
+        if(!name || !mobile){
           res.writeHead(400,{'Content-Type':'application/json'});
           return res.end(JSON.stringify({success:false,message:'Required data missing'}));
+        }
+
+        const father=String(input.father || '').trim();
+        const dob=String(input.dob || '').trim();
+        const course=String(input.course || '').trim();
+        const address=String(input.address || '').trim();
+
+        if(
+          name.length>100 ||
+          father.length>100 ||
+          mobile.length>15 ||
+          dob.length>20 ||
+          course.length>100 ||
+          address.length>300 ||
+          !/^[0-9+ -]+$/.test(mobile)
+        ){
+          res.writeHead(400,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({success:false,message:'Invalid registration data'}));
+        }
+
+        const photo=typeof input.photo === 'string' ? input.photo.trim() : '';
+        if(photo){
+          const photoPattern=/^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=]+$/i;
+          if(!photoPattern.test(photo) || photo.length>80*1024){
+            res.writeHead(400,{'Content-Type':'application/json'});
+            return res.end(JSON.stringify({success:false,message:'Invalid or oversized photo'}));
+          }
         }
         let data={students:[]};
         try{data=JSON.parse(fs.readFileSync(DATA_FILE,'utf8'));}catch(e){}
         if(!Array.isArray(data.students)) data.students=[];
 
-        const index=data.students.findIndex(x=>x.id===student.id);
-        if(index>=0){
-          data.students[index]={...data.students[index],...student};
-        }else{
-          data.students.push(student);
+        const mobileExists=data.students.some(st=>
+          String(st.mobile || '').trim()===mobile
+        );
+
+        if(mobileExists){
+          res.writeHead(409,{'Content-Type':'application/json'});
+          return res.end(JSON.stringify({
+            success:false,
+            message:'इस Mobile Number से पहले ही registration मौजूद है'
+          }));
         }
 
+        const student={
+          id:'ACA'+Date.now().toString().slice(-6)+crypto.randomBytes(2).toString('hex').toUpperCase(),
+          name:name,
+          father:father,
+          mobile:mobile,
+          dob:dob,
+          course:course,
+          address:address,
+          photo:photo
+        };
+
+        data.students.push(student);
+
         fs.writeFileSync(DATA_FILE,JSON.stringify(data,null,2));
+
         res.writeHead(200,{'Content-Type':'application/json'});
-        res.end(JSON.stringify({success:true,message:'Registration saved'}));
+        res.end(JSON.stringify({
+          success:true,
+          message:'Registration saved',
+          student:student
+        }));
       }catch(e){
         res.writeHead(400,{'Content-Type':'application/json'});
         res.end(JSON.stringify({success:false,message:'Invalid data'}));
@@ -333,7 +708,7 @@ if(req.url==='/api/register' && req.method==='POST'){
     });
     return;
   }
-  if(req.url==='/registration'){
+if(req.url==='/registration'){
     res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});
     res.end(`<!DOCTYPE html>
 <html lang="hi">
@@ -393,6 +768,41 @@ function register(e){
       res.end('Logo not found');
     }
     return;
+  }
+
+  if(req.url==='/.admin_credentials' || req.url.startsWith('/.admin_credentials?')){
+    res.writeHead(404,{'Content-Type':'application/json'});
+    return res.end(JSON.stringify({success:false,message:'Not found'}));
+  }
+
+  if(req.url==='/students.json' || req.url.startsWith('/students.json?')){
+    res.writeHead(404,{'Content-Type':'application/json'});
+    return res.end(JSON.stringify({success:false,message:'Not found'}));
+  }
+
+  const blockedPath=req.url.split('?')[0];
+  if(
+    blockedPath==='/.env' ||
+    blockedPath.startsWith('/.env.') ||
+    blockedPath.startsWith('/server.js.backup') ||
+    blockedPath.startsWith('/server_backup_security_') ||
+    blockedPath.includes('.backup')
+  ){
+    res.writeHead(404,{'Content-Type':'application/json'});
+    return res.end(JSON.stringify({success:false,message:'Not found'}));
+  }
+
+  if(req.url.startsWith('/api/')){
+    res.writeHead(404,{'Content-Type':'application/json'});
+    return res.end(JSON.stringify({success:false,message:'API endpoint not found'}));
+  }
+
+  if(req.method!=='GET'){
+    res.writeHead(405,{
+      'Content-Type':'application/json',
+      'Allow':'GET, POST'
+    });
+    return res.end(JSON.stringify({success:false,message:'Method not allowed'}));
   }
 
   res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});

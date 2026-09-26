@@ -606,6 +606,24 @@ Registration Successfully Completed ✅
 </div></footer>
 
 <script>
+function escHTML(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+
+let adminToken=sessionStorage.getItem("adminToken") || "";
+
+function adminHeaders(extra={}){
+  return {
+    ...extra,
+    ...(adminToken ? {"Authorization":"Bearer "+adminToken} : {})
+  };
+}
+
 function showAdminPanel(){
   document.querySelectorAll("main").forEach(x=>x.style.display="none");
   const panel=document.getElementById("adminPanel");
@@ -616,7 +634,7 @@ function showAdminPanel(){
 
 
 function loadCourseFees(){
-  const password=document.getElementById("adminPassword").value;
+  if(!adminToken) return;
   const box=document.getElementById("courseFeesBox");
   const msg=document.getElementById("feeMessage");
 
@@ -670,10 +688,7 @@ function saveCourseFees(){
 
   fetch("/api/course-fees",{
     method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "x-admin-password":password
-    },
+    headers:adminHeaders({"Content-Type":"application/json"}),
     body:JSON.stringify(fees)
   })
   .then(r=>r.json())
@@ -700,17 +715,35 @@ function loadAdminStudents(){
 
   msg.textContent="Admin login हो रहा है...";
 
-  fetch("/api/students",{
-    method:"GET",
-    headers:{
-      "x-admin-username":username,
-      "x-admin-password":password
-    }
+  fetch("/api/admin/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({username:username,password:password})
   })
   .then(r=>r.json())
+  .then(login=>{
+    if(!login.success){
+      msg.textContent=login.message || "Admin login failed";
+      box.innerHTML="";
+      return;
+    }
+
+    adminToken=login.token;
+    sessionStorage.setItem("adminToken",adminToken);
+
+    document.getElementById("adminPassword").value="";
+
+    return fetch("/api/students",{
+      method:"GET",
+      headers:adminHeaders()
+    });
+  })
+  .then(r=>r ? r.json() : null)
   .then(data=>{
+    if(!data) return;
+
     if(!data.success){
-      msg.textContent=data.message || "Admin login failed";
+      msg.textContent=data.message || "Admin session failed";
       box.innerHTML="";
       return;
     }
@@ -745,6 +778,7 @@ function loadAdminStudents(){
     msg.textContent="❌ Server से connection नहीं हो सका।";
   });
 }
+
 function filterAdminStudents(){
   const list=document.getElementById("filteredStudentList");
   if(!list || !window.adminStudentsData) return;
@@ -762,14 +796,14 @@ function filterAdminStudents(){
 
   list.innerHTML=matches.length ? matches.map(({st,i})=>`
     <div style="background:#f8faff;border:1px solid #dbe5f5;border-radius:12px;padding:15px;margin-top:12px;text-align:left;">
-      ${st.photo ? `<img src="${st.photo}" style="width:70px;height:85px;object-fit:cover;border-radius:7px;border:2px solid #0b3d91;display:block;margin-bottom:10px;">` : ""}
-      <b>Student ID:</b> ${st.id}<br>
-      <b>Name:</b> ${st.name}<br>
-      <b>Father:</b> ${st.father}<br>
-      <b>Mobile:</b> ${st.mobile}<br>
-      <b>DOB:</b> ${st.dob}<br>
-      <b>Course:</b> ${st.course}<br>
-      <b>Address:</b> ${st.address}<br>
+      ${st.photo && /^data:image\/(jpeg|jpg|png|webp);base64,/i.test(st.photo) ? `<img src="${escHTML(st.photo)}" style="width:70px;height:85px;object-fit:cover;border-radius:7px;border:2px solid #0b3d91;display:block;margin-bottom:10px;">` : ""}
+      <b>Student ID:</b> ${escHTML(st.id)}<br>
+      <b>Name:</b> ${escHTML(st.name)}<br>
+      <b>Father:</b> ${escHTML(st.father)}<br>
+      <b>Mobile:</b> ${escHTML(st.mobile)}<br>
+      <b>DOB:</b> ${escHTML(st.dob)}<br>
+      <b>Course:</b> ${escHTML(st.course)}<br>
+      <b>Address:</b> ${escHTML(st.address)}<br>
       <b>Payment Status:</b> ${st.paymentStatus || "Pending"}<br>
       <b>Paid Amount:</b> ₹${st.paymentAmount || 0}<br>
       <b>Payment Date:</b> ${st.paymentDate ? new Date(st.paymentDate).toLocaleString("en-IN") : "—"}<br>
@@ -790,15 +824,9 @@ function setPaymentStatus(i,status){
   const st=window.adminStudentsData[i];
   if(!st) return;
 
-  const password=document.getElementById("adminPassword").value;
-
   fetch("/api/payment-status",{
     method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "x-admin-username":document.getElementById("adminUsername").value.trim(),
-      "x-admin-password":password
-    },
+    headers:adminHeaders({"Content-Type":"application/json"}),
     body:JSON.stringify({
       id:st.id,
       paymentStatus:status
@@ -828,15 +856,9 @@ function deleteAdminStudent(i){
     return;
   }
 
-  const password=document.getElementById("adminPassword").value;
-
   fetch("/api/delete-student",{
     method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "x-admin-username":document.getElementById("adminUsername").value.trim(),
-      "x-admin-password":password
-    },
+    headers:adminHeaders({"Content-Type":"application/json"}),
     body:JSON.stringify({id:st.id})
   })
   .then(r=>r.json())

@@ -2,3 +2,10 @@
 students.json
 *_backup_*.html
 *_backup_*.js
+
+.env
+.env.*
+server.js.backup*
+server_backup_security_*.js
+index_backup_security_*.html
+*.backup*
