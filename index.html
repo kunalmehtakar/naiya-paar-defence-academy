@@ -1157,12 +1157,17 @@ async function submitRegistration(e){
   }
 
   try{
-    const photoData=await new Promise((resolve,reject)=>{
-      const reader=new FileReader();
-      reader.onload=()=>resolve(reader.result);
-      reader.onerror=()=>reject(new Error("Photo read failed"));
-      reader.readAsDataURL(photo);
-    });
+    const buffer=await photo.arrayBuffer();
+    const bytes=new Uint8Array(buffer);
+    let binary="";
+    const chunkSize=8192;
+
+    for(let i=0;i<bytes.length;i+=chunkSize){
+      const chunk=bytes.subarray(i,i+chunkSize);
+      binary+=String.fromCharCode(...chunk);
+    }
+
+    const photoData="data:"+(photo.type || "image/jpeg")+";base64,"+btoa(binary);
 
     const id="ACA"+Date.now().toString().slice(-6);
 
