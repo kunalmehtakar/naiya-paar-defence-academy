@@ -493,8 +493,9 @@ header p{opacity:.9}
 <label>Mobile Number</label>
 <input type="tel" id="mobile" placeholder="10 अंकों का मोबाइल नंबर" maxlength="10" required>
 
-<label>Student Photo</label>
-<input type="file" id="photo" accept="image/*" required onchange="previewPhoto(event)">
+<label>Student Photo <span style="color:#b00020;font-size:13px;">(अधिकतम 50 KB)</span></label>
+<input type="file" id="photo" accept="image/jpeg,image/png,image/webp" required onchange="previewPhoto(event)">
+<small style="display:block;color:#666;margin-top:5px;">JPG, PNG या WEBP • अधिकतम 50 KB</small>
 <div style="text-align:center;margin-top:10px">
 <img id="photoPreview" style="display:none;width:120px;height:150px;object-fit:cover;border-radius:10px;border:2px solid #0b3d91">
 </div>
@@ -1138,6 +1139,12 @@ async function submitRegistration(e){
   const course=document.getElementById("course").value;
   const address=document.getElementById("address").value.trim();
   const photo=document.getElementById("photo").files[0];
+
+  if(photo && photo.size>50*1024){
+    alert("Student Photo अधिकतम 50 KB होनी चाहिए। कृपया छोटी photo चुनें।");
+    document.getElementById("photo").value="";
+    return;
+  }
 
   if(!photo){
     alert("कृपया Student Photo upload करें।");
