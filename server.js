@@ -523,8 +523,6 @@ const server=http.createServer((req,res)=>{
 
   if(req.url==='/api/students' && req.method==='GET'){
     if(!requireAdminSession(req,res)){
-      res.writeHead(401,{'Content-Type':'application/json'});
-      res.end(JSON.stringify({success:false,message:'Admin login required'}));
       return;
     }
     try{

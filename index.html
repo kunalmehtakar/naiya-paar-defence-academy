@@ -638,7 +638,6 @@ function loadCourseFees(){
   const box=document.getElementById("courseFeesBox");
   const msg=document.getElementById("feeMessage");
 
-  if(!password) return;
 
   fetch("/api/course-fees")
     .then(r=>r.json())
