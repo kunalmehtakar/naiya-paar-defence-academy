@@ -985,23 +985,41 @@ document.getElementById("home").style.display="block";
 window.scrollTo(0,0);
 }
 
+window.selectedPhotoData="";
+
 function previewPhoto(event){
   const file=event.target.files && event.target.files[0];
   const preview=document.getElementById("photoPreview");
+
+  window.selectedPhotoData="";
+
   if(!file) return;
-  if(!file.type.startsWith("image/")){
+
+  if(file.size>50*1024){
+    alert("Student Photo अधिकतम 50 KB होनी चाहिए। कृपया छोटी photo चुनें।");
+    event.target.value="";
+    return;
+  }
+
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
     alert("कृपया JPG, PNG या WEBP photo चुनें।");
     event.target.value="";
     return;
   }
+
   const reader=new FileReader();
+
   reader.onload=function(e){
+    window.selectedPhotoData=e.target.result;
     preview.src=e.target.result;
     preview.style.display="block";
   };
+
   reader.onerror=function(){
+    window.selectedPhotoData="";
     alert("Photo load नहीं हो सकी। दूसरी photo चुनें।");
   };
+
   reader.readAsDataURL(file);
 }
 
@@ -1157,17 +1175,12 @@ async function submitRegistration(e){
   }
 
   try{
-    const buffer=await photo.arrayBuffer();
-    const bytes=new Uint8Array(buffer);
-    let binary="";
-    const chunkSize=8192;
-
-    for(let i=0;i<bytes.length;i+=chunkSize){
-      const chunk=bytes.subarray(i,i+chunkSize);
-      binary+=String.fromCharCode(...chunk);
+    if(!window.selectedPhotoData){
+      alert("Photo अभी process नहीं हुई है। कृपया photo दोबारा चुनें।");
+      return;
     }
 
-    const photoData="data:"+(photo.type || "image/jpeg")+";base64,"+btoa(binary);
+    const photoData=window.selectedPhotoData;
 
     const id="ACA"+Date.now().toString().slice(-6);
 
