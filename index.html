@@ -1224,8 +1224,8 @@ async function submitRegistration(e){
     showPayment();
 
   }catch(err){
-    console.error(err);
-    alert("Photo process नहीं हो सका। कृपया दूसरी photo चुनें।");
+    console.error("PHOTO PROCESS ERROR:",err);
+    alert("Photo process error: "+(err && err.message ? err.message : String(err)));
   }
 }
 
